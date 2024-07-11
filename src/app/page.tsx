@@ -1,52 +1,59 @@
 import Link from "next/link";
+import Image from "next/image";
 
-import { LatestPost } from "~/app/_components/post";
 import { getServerAuthSession } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
+import { RealTimeHour } from "./_components/RealTimeHours";
+import defaultImage from "../images/default.webp";
 
 export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
   const session = await getServerAuthSession();
+
+  const color1 = "#035d80";
+  const color2 = "#aab9af";
 
   void api.post.getLatest.prefetch();
 
   return (
     <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
+      <main
+        className={`flex min-h-screen items-center justify-center text-white`}
+        style={{
+          background: `linear-gradient(to bottom, ${color1}, ${color2})`,
+        }}
+      >
+        <div className="flex flex-row gap-10">
+          <div className="relative h-[600px] w-[350px] overflow-hidden rounded-md shadow-[0px_54px_55px_rgba(0,0,0,0.25),0px_-12px_30px_rgba(0,0,0,0.12),0px_4px_6px_rgba(0,0,0,0.12),0px_12px_13px_rgba(0,0,0,0.17),0px_-3px_5px_rgba(0,0,0,0.09)]">
+            <Image
+              src={defaultImage}
+              alt="Default image"
+              layout="fill"
+              objectFit="cover"
+            />
           </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
 
-            <div className="flex flex-col items-center justify-center gap-4">
+          <div className="flex flex-col items-center gap-10 pt-5">
+            <p className="text-sm">this place sure feels haunted...</p>
+            <RealTimeHour />
+            <form action="https://google.com/search" method="get">
+              <input
+                className="w-25rem md:w-30rem lg:w-30rem h-3rem rounded-md border-none bg-black bg-opacity-30 px-5 text-sm font-normal leading-normal text-white placeholder-white outline-none"
+                type="text"
+                name="q"
+                placeholder="Rechercher sur Google"
+                autoComplete="off"
+                required
+              />
+            </form>
+          </div>
+        </div>
+      </main>
+    </HydrateClient>
+  );
+}
+{
+  /* {session?.user && <LatestPost />}
+  <div className="flex flex-col items-center justify-center gap-4">
               <p className="text-center text-2xl text-white">
                 {session && <span>Logged in as {session.user?.name}</span>}
               </p>
@@ -56,12 +63,5 @@ export default async function Home() {
               >
                 {session ? "Sign out" : "Sign in"}
               </Link>
-            </div>
-          </div>
-
-          {session?.user && <LatestPost />}
-        </div>
-      </main>
-    </HydrateClient>
-  );
+            </div> */
 }

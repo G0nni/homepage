@@ -6,7 +6,14 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-geist-sans)", ...fontFamily.sans],
+        sans: ["MonaspaceNeon-Regular", ...fontFamily.sans],
+      },
+      width: {
+        "30rem": "30rem",
+        "25rem": "25rem",
+      },
+      height: {
+        "3rem": "3rem",
       },
     },
   },

@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "MonaspaceNeon-Regular";
+  src:
+    local("MonaspaceNeon-Regular"),
+    url("../Fonts/MonaspaceNeon-Regular.otf") format("otf");
+}
