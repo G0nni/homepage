@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import SettingsIcon from "~/assets/svg/cil-settings.svg";
 
 import { getServerAuthSession } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
@@ -23,6 +24,25 @@ export default async function Home() {
           background: `linear-gradient(to bottom, ${color1}, ${color2})`,
         }}
       >
+        <div className="absolute right-5 top-5 flex items-center gap-4">
+          <p className="text-normal text-center text-white">
+            {session && <span>Bienvenue {session.user?.name} !</span>}
+          </p>
+          <Link
+            href={session ? "/api/auth/signout" : "/api/auth/signin"}
+            className="rounded-md bg-white/10 px-5 py-3 font-semibold no-underline transition hover:bg-white/20"
+          >
+            {session ? "Se déconnecter" : "Se connecter"}
+          </Link>
+          <button className="rounded-md bg-transparent px-3 py-3 font-semibold no-underline transition hover:bg-white/10">
+            <Image
+              src={SettingsIcon}
+              alt="Settings icon"
+              width={30}
+              height={30}
+            />
+          </button>
+        </div>
         <div className="flex flex-row gap-10">
           <div className="relative hidden h-[600px] w-[350px] overflow-hidden rounded-md shadow-[0px_54px_55px_rgba(0,0,0,0.25),0px_-12px_30px_rgba(0,0,0,0.12),0px_4px_6px_rgba(0,0,0,0.12),0px_12px_13px_rgba(0,0,0,0.17),0px_-3px_5px_rgba(0,0,0,0.09)] md:flex lg:flex">
             <Image
