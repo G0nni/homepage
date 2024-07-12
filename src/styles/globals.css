@@ -8,3 +8,25 @@
     local("MonaspaceNeon-Regular"),
     url("../Fonts/MonaspaceNeon-Regular.otf") format("otf");
 }
+
+.custom-scrollbar {
+  scrollbar-width: none; /* Pour Firefox */
+  scrollbar-color: #e2e2e2 transparent; /* Couleur de la barre et du fond */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 2px; /* Hauteur de la barre de défilement horizontale */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* Couleur du fond de la barre de défilement */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #e2e2e2; /* Couleur de la barre de défilement */
+  border-radius: 4px; /* Arrondir les angles de la barre de défilement */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #e2e2e2; /* Assurez-vous que cette couleur correspond à celle définie pour *::-webkit-scrollbar-thumb */
+}
