@@ -14,8 +14,6 @@ export default async function Home() {
   const color1 = "#035d80";
   const color2 = "#aab9af";
 
-  void api.post.getLatest.prefetch();
-
   return (
     <HydrateClient>
       <main

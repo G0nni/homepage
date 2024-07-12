@@ -111,7 +111,7 @@ export function Tabs() {
 
     const newLink: Link = {
       href: newLinkHref,
-      logo: newLinkLogo,
+      logo: "https://logo.clearbit.com/" + newLinkHref,
       alt: newLinkAlt,
     };
 
@@ -179,7 +179,8 @@ export function Tabs() {
                 <img
                   src={link.logo}
                   alt={link.alt}
-                  className="rounded-md border-none bg-black bg-opacity-30 object-cover px-2 py-2"
+                  className="overflow-x-hidden rounded-md border-none bg-black bg-opacity-30 object-cover px-2 py-2"
+                  style={{ width: "60px", height: "60px" }}
                 />
               </div>
             </a>
@@ -212,27 +213,11 @@ export function Tabs() {
                   value={newLinkHref}
                   onChange={(e) => setNewLinkHref(e.target.value)}
                   placeholder="https://example.com"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 text-gray-800 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   required
                 />
               </div>
-              <div>
-                <label
-                  htmlFor="newLinkLogo"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Logo URL
-                </label>
-                <input
-                  type="url"
-                  id="newLinkLogo"
-                  value={newLinkLogo}
-                  onChange={(e) => setNewLinkLogo(e.target.value)}
-                  placeholder="https://logo.example.com"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  required
-                />
-              </div>
+
               <div>
                 <label
                   htmlFor="newLinkAlt"
@@ -246,7 +231,7 @@ export function Tabs() {
                   value={newLinkAlt}
                   onChange={(e) => setNewLinkAlt(e.target.value)}
                   placeholder="Description"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 text-gray-800 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   required
                 />
               </div>
