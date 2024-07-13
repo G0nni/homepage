@@ -1,5 +1,8 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, MouseEvent } from "react";
+import { ModalAddLink } from "./modalAddLink";
+import { ModalAddTab } from "./modalAddTab";
+import { ContextMenu } from "./contextMenu";
 
 // Define interfaces for the structure of your data
 interface Link {
@@ -11,6 +14,14 @@ interface Link {
 interface Tab {
   name: string;
   links: Link[];
+}
+
+interface ContextMenuState {
+  visible: boolean;
+  x: number;
+  y: number;
+  target: string | null;
+  type: "tab" | "link" | null;
 }
 
 export function Tabs() {
@@ -63,9 +74,19 @@ export function Tabs() {
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTabModalOpen, setIsTabModalOpen] = useState(false);
   const [newLinkHref, setNewLinkHref] = useState("");
   const [newLinkLogo, setNewLinkLogo] = useState("");
   const [newLinkAlt, setNewLinkAlt] = useState("");
+  const [newTabName, setNewTabName] = useState("");
+
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>({
+    visible: false,
+    x: 0,
+    y: 0,
+    target: null,
+    type: null,
+  });
 
   useEffect(() => {
     const checkIfOverflow = () => {
@@ -107,15 +128,12 @@ export function Tabs() {
 
   const handleAddLink = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted");
 
     const newLink: Link = {
       href: newLinkHref,
       logo: "https://logo.clearbit.com/" + newLinkHref,
       alt: newLinkAlt,
     };
-
-    console.log("Adding link...", newLink);
 
     setTabs((prevTabs) => {
       const updatedTabs = prevTabs.map((tab) => {
@@ -139,8 +157,99 @@ export function Tabs() {
     setIsModalOpen(false);
   };
 
+  const handleAddTab = () => {
+    if (!newTabName.trim()) {
+      return;
+    }
+
+    const newTab: Tab = {
+      name: newTabName,
+      links: [],
+    };
+
+    setTabs((prevTabs) => {
+      const updatedTabs = [...prevTabs, newTab];
+      localStorage.setItem("tabs", JSON.stringify(updatedTabs));
+      return updatedTabs;
+    });
+
+    setNewTabName("");
+    setIsTabModalOpen(false);
+  };
+
+  const handleEditTab = (oldName: string, newName: string) => {
+    setTabs((prevTabs) => {
+      const updatedTabs = prevTabs.map((tab) =>
+        tab.name === oldName ? { ...tab, name: newName } : tab,
+      );
+      localStorage.setItem("tabs", JSON.stringify(updatedTabs));
+      return updatedTabs;
+    });
+  };
+
+  const handleDeleteTab = (tabName: string) => {
+    setTabs((prevTabs) => {
+      const updatedTabs = prevTabs.filter((tab) => tab.name !== tabName);
+      localStorage.setItem("tabs", JSON.stringify(updatedTabs));
+      return updatedTabs;
+    });
+  };
+
+  const handleEditLink = (tabName: string, oldHref: string, newLink: Link) => {
+    setTabs((prevTabs) => {
+      const updatedTabs = prevTabs.map((tab) => {
+        if (tab.name === tabName) {
+          return {
+            ...tab,
+            links: tab.links.map((link) =>
+              link.href === oldHref ? newLink : link,
+            ),
+          };
+        }
+        return tab;
+      });
+      localStorage.setItem("tabs", JSON.stringify(updatedTabs));
+      return updatedTabs;
+    });
+  };
+
+  const handleDeleteLink = (tabName: string, href: string) => {
+    setTabs((prevTabs) => {
+      const updatedTabs = prevTabs.map((tab) => {
+        if (tab.name === tabName) {
+          return {
+            ...tab,
+            links: tab.links.filter((link) => link.href !== href),
+          };
+        }
+        return tab;
+      });
+      localStorage.setItem("tabs", JSON.stringify(updatedTabs));
+      return updatedTabs;
+    });
+  };
+
+  const handleContextMenu = (
+    e: MouseEvent,
+    type: "tab" | "link",
+    target: string,
+  ) => {
+    e.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      target: target,
+      type: type,
+    });
+  };
+
+  const handleContextMenuClose = () => {
+    setContextMenu({ visible: false, x: 0, y: 0, target: null, type: null });
+  };
+
   return (
-    <div className="relative">
+    <div className="relative" onClick={handleContextMenuClose}>
       <div
         ref={tabsRef}
         className={`custom-scrollbar flex flex-row gap-2 ${
@@ -158,13 +267,14 @@ export function Tabs() {
               tab.name === activeTab ? "bg-opacity-50" : ""
             }`}
             onClick={() => setActiveTab(tab.name)}
+            onContextMenu={(e) => handleContextMenu(e, "tab", tab.name)}
           >
             {tab.name}
           </button>
         ))}
         <button
           className="text-normal rounded-md border-none bg-black bg-opacity-30 px-5 py-2 transition-transform duration-100 ease-in hover:scale-110"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsTabModalOpen(true)}
         >
           +
         </button>
@@ -174,7 +284,12 @@ export function Tabs() {
         {tabs
           .find((tab) => tab.name === activeTab)
           ?.links.map((link: Link, linkIndex: number) => (
-            <a key={linkIndex} href={link.href} className="col-span-1">
+            <a
+              key={linkIndex}
+              href={link.href}
+              className="col-span-1"
+              onContextMenu={(e) => handleContextMenu(e, "link", link.href)}
+            >
               <div className="transition-transform duration-100 ease-in hover:scale-110 hover:bg-opacity-50">
                 <img
                   src={link.logo}
@@ -186,6 +301,7 @@ export function Tabs() {
             </a>
           ))}
         <button
+          style={{ width: "60px", height: "60px" }}
           className="text-normal rounded-md border-none bg-black bg-opacity-30 px-5 py-2 transition-transform duration-100 ease-in hover:scale-110"
           onClick={() => setIsModalOpen(true)}
         >
@@ -194,65 +310,58 @@ export function Tabs() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="mx-auto w-11/12 max-w-md rounded-lg bg-white p-6 shadow-lg">
-            <form onSubmit={handleAddLink} className="space-y-4">
-              <h3 className="text-xl font-semibold text-gray-800">
-                Add a New Link
-              </h3>
-              <div>
-                <label
-                  htmlFor="newLinkHref"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Link URL
-                </label>
-                <input
-                  type="url"
-                  id="newLinkHref"
-                  value={newLinkHref}
-                  onChange={(e) => setNewLinkHref(e.target.value)}
-                  placeholder="https://example.com"
-                  className="mt-1 block w-full rounded-md border-gray-300 text-gray-800 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  required
-                />
-              </div>
+        <ModalAddLink
+          setIsModalOpen={setIsModalOpen}
+          handleAddLink={handleAddLink}
+          newLinkHref={newLinkHref}
+          setNewLinkHref={setNewLinkHref}
+          newLinkAlt={newLinkAlt}
+          setNewLinkAlt={setNewLinkAlt}
+        />
+      )}
 
-              <div>
-                <label
-                  htmlFor="newLinkAlt"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Alt Text
-                </label>
-                <input
-                  type="text"
-                  id="newLinkAlt"
-                  value={newLinkAlt}
-                  onChange={(e) => setNewLinkAlt(e.target.value)}
-                  placeholder="Description"
-                  className="mt-1 block w-full rounded-md border-gray-300 text-gray-800 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  required
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                  Add Link
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {isTabModalOpen && (
+        <ModalAddTab
+          setIsModalOpen={setIsTabModalOpen}
+          handleAddTab={handleAddTab}
+          newTabName={newTabName}
+          setNewTabName={setNewTabName}
+        />
+      )}
+
+      {contextMenu.visible && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          type={contextMenu.type}
+          target={contextMenu.target}
+          onClose={handleContextMenuClose}
+          onEdit={(newName) => {
+            if (contextMenu.type === "tab") {
+              handleEditTab(contextMenu.target!, newName);
+            } else if (contextMenu.type === "link") {
+              const activeTabObj = tabs.find((tab) => tab.name === activeTab);
+              if (activeTabObj) {
+                const linkToEdit = activeTabObj.links.find(
+                  (link) => link.href === contextMenu.target,
+                );
+                if (linkToEdit) {
+                  handleEditLink(activeTabObj.name, linkToEdit.href, {
+                    ...linkToEdit,
+                    href: newName,
+                  });
+                }
+              }
+            }
+          }}
+          onDelete={() => {
+            if (contextMenu.type === "tab") {
+              handleDeleteTab(contextMenu.target!);
+            } else if (contextMenu.type === "link") {
+              handleDeleteLink(activeTab, contextMenu.target!);
+            }
+          }}
+        />
       )}
     </div>
   );
