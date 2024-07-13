@@ -60,7 +60,7 @@ export function ContextMenu({
             type="text"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="mb-2 rounded-md border px-2 py-1"
+            className="mb-2 rounded-md border px-2 py-1 text-gray-700"
           />
           <button
             className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"

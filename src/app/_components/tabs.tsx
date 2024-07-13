@@ -69,6 +69,7 @@ export function Tabs() {
   const [activeTab, setActiveTab] = useState<string>(tabs[0]?.name || "Home");
   const [isSliderMode, setIsSliderMode] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -235,21 +236,42 @@ export function Tabs() {
     target: string,
   ) => {
     e.preventDefault();
-    setContextMenu({
-      visible: true,
-      x: e.clientX,
-      y: e.clientY,
-      target: target,
-      type: type,
-    });
+    if (tabsRef.current) {
+      const { left, top } = tabsRef.current.getBoundingClientRect();
+      setContextMenu({
+        visible: true,
+        x: e.clientX - left,
+        y: e.clientY - top,
+        target: target,
+        type: type,
+      });
+    }
   };
 
   const handleContextMenuClose = () => {
     setContextMenu({ visible: false, x: 0, y: 0, target: null, type: null });
   };
 
+  const handleOutsideClick = () => {
+    if (contextMenuRef.current) {
+      handleContextMenuClose();
+    }
+  };
+
+  useEffect(() => {
+    if (contextMenu.visible) {
+      window.addEventListener("click", handleOutsideClick);
+    } else {
+      window.removeEventListener("click", handleOutsideClick);
+    }
+
+    return () => {
+      window.removeEventListener("click", handleOutsideClick);
+    };
+  }, [contextMenu.visible]);
+
   return (
-    <div className="relative" onClick={handleContextMenuClose}>
+    <div className="relative">
       <div
         ref={tabsRef}
         className={`custom-scrollbar flex flex-row gap-2 ${
@@ -260,12 +282,12 @@ export function Tabs() {
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
       >
-        {tabs.map((tab: Tab, index: number) => (
+        {tabs.map((tab, index) => (
           <button
             key={index}
-            className={`text-normal rounded-md border-none bg-black bg-opacity-30 px-4 py-2 ${
+            className={`${
               tab.name === activeTab ? "bg-opacity-50" : ""
-            }`}
+            } whitespace-nowrap rounded-md bg-black bg-opacity-30 px-5 py-2`}
             onClick={() => setActiveTab(tab.name)}
             onContextMenu={(e) => handleContextMenu(e, "tab", tab.name)}
           >
@@ -273,7 +295,7 @@ export function Tabs() {
           </button>
         ))}
         <button
-          className="text-normal rounded-md border-none bg-black bg-opacity-30 px-5 py-2 transition-transform duration-100 ease-in hover:scale-110"
+          className="text-normal rounded-md bg-black bg-opacity-30 px-5 py-2 transition-transform duration-100 ease-in hover:scale-110"
           onClick={() => setIsTabModalOpen(true)}
         >
           +
@@ -283,7 +305,7 @@ export function Tabs() {
       <div className="grid grid-cols-6 gap-2 pt-2 md:grid-cols-7 lg:grid-cols-7">
         {tabs
           .find((tab) => tab.name === activeTab)
-          ?.links.map((link: Link, linkIndex: number) => (
+          ?.links.map((link, linkIndex) => (
             <a
               key={linkIndex}
               href={link.href}
@@ -330,38 +352,40 @@ export function Tabs() {
       )}
 
       {contextMenu.visible && (
-        <ContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          type={contextMenu.type}
-          target={contextMenu.target}
-          onClose={handleContextMenuClose}
-          onEdit={(newName) => {
-            if (contextMenu.type === "tab") {
-              handleEditTab(contextMenu.target!, newName);
-            } else if (contextMenu.type === "link") {
-              const activeTabObj = tabs.find((tab) => tab.name === activeTab);
-              if (activeTabObj) {
-                const linkToEdit = activeTabObj.links.find(
-                  (link) => link.href === contextMenu.target,
-                );
-                if (linkToEdit) {
-                  handleEditLink(activeTabObj.name, linkToEdit.href, {
-                    ...linkToEdit,
-                    href: newName,
-                  });
+        <div ref={contextMenuRef}>
+          <ContextMenu
+            x={contextMenu.x}
+            y={contextMenu.y}
+            type={contextMenu.type}
+            target={contextMenu.target}
+            onClose={handleContextMenuClose}
+            onEdit={(newName) => {
+              if (contextMenu.type === "tab") {
+                handleEditTab(contextMenu.target!, newName);
+              } else if (contextMenu.type === "link") {
+                const activeTabObj = tabs.find((tab) => tab.name === activeTab);
+                if (activeTabObj) {
+                  const linkToEdit = activeTabObj.links.find(
+                    (link) => link.href === contextMenu.target,
+                  );
+                  if (linkToEdit) {
+                    handleEditLink(activeTabObj.name, linkToEdit.href, {
+                      ...linkToEdit,
+                      href: newName,
+                    });
+                  }
                 }
               }
-            }
-          }}
-          onDelete={() => {
-            if (contextMenu.type === "tab") {
-              handleDeleteTab(contextMenu.target!);
-            } else if (contextMenu.type === "link") {
-              handleDeleteLink(activeTab, contextMenu.target!);
-            }
-          }}
-        />
+            }}
+            onDelete={() => {
+              if (contextMenu.type === "tab") {
+                handleDeleteTab(contextMenu.target!);
+              } else if (contextMenu.type === "link") {
+                handleDeleteLink(activeTab, contextMenu.target!);
+              }
+            }}
+          />
+        </div>
       )}
     </div>
   );
