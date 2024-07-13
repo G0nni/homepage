@@ -1,10 +1,15 @@
 "use client";
-import React, { useState, useEffect, useRef, MouseEvent } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  MouseEvent,
+  WheelEvent,
+} from "react";
 import { ModalAddLink } from "./modalAddLink";
 import { ModalAddTab } from "./modalAddTab";
 import { ContextMenu } from "./contextMenu";
 
-// Define interfaces for the structure of your data
 interface Link {
   href: string;
   logo: string;
@@ -59,7 +64,6 @@ export function Tabs() {
   ]);
 
   useEffect(() => {
-    // This code now runs only on the client, after mounting
     const savedTabs = localStorage.getItem("tabs");
     if (savedTabs) {
       setTabs(JSON.parse(savedTabs));
@@ -123,7 +127,7 @@ export function Tabs() {
     if (!isDragging || !tabsRef.current) return;
     e.preventDefault();
     const x = e.pageX - tabsRef.current.offsetLeft;
-    const walk = (x - startX) * 2; // Multipliez par 2 pour augmenter la vitesse de défilement
+    const walk = (x - startX) * 2;
     tabsRef.current.scrollLeft = scrollLeft - walk;
   };
 
@@ -146,12 +150,10 @@ export function Tabs() {
         }
         return tab;
       });
-      // Save the updated tabs to localStorage
       localStorage.setItem("tabs", JSON.stringify(updatedTabs));
       return updatedTabs;
     });
 
-    // Clear form fields
     setNewLinkHref("");
     setNewLinkLogo("");
     setNewLinkAlt("");
@@ -258,6 +260,12 @@ export function Tabs() {
     }
   };
 
+  const handleWheel = (e: WheelEvent<HTMLDivElement>) => {
+    if (tabsRef.current) {
+      tabsRef.current.scrollLeft += e.deltaY;
+    }
+  };
+
   useEffect(() => {
     if (contextMenu.visible) {
       window.addEventListener("click", handleOutsideClick);
@@ -275,12 +283,13 @@ export function Tabs() {
       <div
         ref={tabsRef}
         className={`custom-scrollbar flex flex-row gap-2 ${
-          isSliderMode ? "overflow-x-auto pb-2" : ""
+          isSliderMode ? "overflow-x-auto" : ""
         }`}
         onMouseDown={handleMouseDown}
         onMouseLeave={handleMouseLeave}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
+        onWheel={handleWheel}
       >
         {tabs.map((tab, index) => (
           <button
