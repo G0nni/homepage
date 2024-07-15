@@ -33,6 +33,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({
   const handleSave = () => {
     localStorage.setItem("topColor", JSON.stringify(topColor));
     localStorage.setItem("bottomColor", JSON.stringify(bottomColor));
+    window.dispatchEvent(new Event("storage"));
     setIsSaved(true);
   };
 
@@ -45,6 +46,21 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({
         >
           Choisir le thème
         </label>
+        <div className="m-5 flex items-center">
+          <input
+            id="autoTheme"
+            type="checkbox"
+            onChange={handleAutoThemeChange}
+            checked={isAutoThemeEnabled}
+            className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
+          />
+          <label
+            htmlFor="autoTheme"
+            className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+          >
+            Changer le thème en fonction de l'image sélectionnée
+          </label>
+        </div>
         {!isAutoThemeEnabled ? (
           <div className="mt-2 flex flex-col space-x-4 p-5 md:flex-row lg:flex-row">
             <div className="flex-grow">
@@ -72,31 +88,14 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({
           ""
         )}
       </div>
-      {!isAutoThemeEnabled && (
-        <div className="mb-4">
-          <button
-            onClick={handleSave}
-            className="rounded-md bg-blue-500 px-4 py-2 text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            disabled={isSaved}
-          >
-            {isSaved ? "Sauvegardé !" : "Valider"}
-          </button>
-        </div>
-      )}
-      <div className="mb-4 flex items-center">
-        <input
-          id="autoTheme"
-          type="checkbox"
-          onChange={handleAutoThemeChange}
-          checked={isAutoThemeEnabled}
-          className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
-        />
-        <label
-          htmlFor="autoTheme"
-          className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+
+      <div className="mb-4">
+        <button
+          onClick={handleSave}
+          className="rounded-md bg-blue-500 px-4 py-2 text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
         >
-          Changer le thème en fonction de l'image sélectionnée
-        </label>
+          Valider
+        </button>
       </div>
     </div>
   );

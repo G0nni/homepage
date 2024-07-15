@@ -7,7 +7,7 @@ import { RealTimeHour } from "./_components/RealTimeHours";
 import { Tabs } from "./_components/tabs";
 import { SettingsModal } from "./_components/settingsModal";
 import { ImageContainer } from "./_components/imageContainer";
-import defaultImage from "../images/default.webp";
+import { BackgroundGradient } from "./_components/backgroundGradient";
 
 export default async function Home() {
   const session = await getServerAuthSession();
@@ -17,11 +17,12 @@ export default async function Home() {
 
   return (
     <HydrateClient>
+      <BackgroundGradient />
       <main
         className={`flex min-h-screen items-start justify-center text-white md:items-center lg:items-center`}
-        style={{
-          background: `linear-gradient(to bottom, ${color1}, ${color2})`,
-        }}
+        // style={{
+        //   background: `linear-gradient(to bottom, ${color1}, ${color2})`,
+        // }}
       >
         <div className="absolute right-5 top-5 flex items-center gap-4">
           <p className="text-normal text-center text-white">

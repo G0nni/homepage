@@ -20,10 +20,14 @@ export function SettingsModal() {
     if (storedImage) {
       setImagePreviewUrl(storedImage);
     }
-
+    // Read the autoThemeEnabled value from localStorage and initialize isAutoThemeEnabled state
     const storedAutoTheme = localStorage.getItem("autoThemeEnabled");
-    if (storedAutoTheme) {
-      setIsAutoThemeEnabled(storedAutoTheme === "true");
+    const isAutoEnabled = storedAutoTheme === "true";
+    setIsAutoThemeEnabled(isAutoEnabled); // This will correctly set the state based on localStorage
+
+    // If auto theme is enabled, attempt to extract and store colors
+    if (isAutoEnabled) {
+      extractAndStoreColors();
     }
   }, []);
 
@@ -33,9 +37,8 @@ export function SettingsModal() {
     } else {
       localStorage.removeItem("lightVibrant");
       localStorage.removeItem("darkVibrant");
-      window.dispatchEvent(new Event("theme-update"));
+      window.dispatchEvent(new Event("storage"));
     }
-    localStorage.setItem("autoThemeEnabled", String(isAutoThemeEnabled));
   }, [isAutoThemeEnabled]);
 
   const openSettingsModal = () => {
@@ -48,7 +51,12 @@ export function SettingsModal() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    const validImageTypes = ["image/gif", "image/jpeg", "image/png"];
+    const validImageTypes = [
+      "image/gif",
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
 
     if (!file) {
       alert("Aucun fichier sélectionné.");
@@ -79,11 +87,17 @@ export function SettingsModal() {
 
   const handleThemeChange = (e: {
     target: { value: React.SetStateAction<string> };
-  }) => setSelectedTheme(e.target.value);
+  }) => {
+    setSelectedTheme(e.target.value);
+    window.dispatchEvent(new Event("storage"));
+  };
 
-  const handleAutoThemeChange = (e: {
-    target: { checked: boolean | ((prevState: boolean) => boolean) };
-  }) => setIsAutoThemeEnabled(e.target.checked);
+  const handleAutoThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = e.target.checked;
+    setIsAutoThemeEnabled(isChecked);
+    localStorage.setItem("autoThemeEnabled", isChecked ? "true" : "false");
+    window.dispatchEvent(new Event("storage"));
+  };
 
   const tabs = [
     { id: "general", name: "Général" },
