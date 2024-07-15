@@ -15,7 +15,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   handleSaveImage,
 }) => {
   return (
-    <div className="flex">
+    <div className="flex flex-col md:flex-row lg:flex-row">
       <div className="w-1/2">
         <div className="mb-4">
           <label

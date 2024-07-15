@@ -123,6 +123,7 @@ export function SettingsModal() {
       case "theme":
         return (
           <div className="max-h-full overflow-y-auto">
+            <p className="mb-4">Personnalisez votre thème ici</p>
             <ImageUploader
               imagePreviewUrl={imagePreviewUrl}
               setImagePreviewUrl={setImagePreviewUrl}

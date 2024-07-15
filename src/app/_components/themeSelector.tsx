@@ -37,7 +37,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({
   };
 
   return (
-    <div className="w-full">
+    <div className="mt-5 w-full">
       <div className="mb-4">
         <label
           htmlFor="themeSelector"
@@ -46,7 +46,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({
           Choisir le thème
         </label>
         {!isAutoThemeEnabled ? (
-          <div className="mt-2 flex space-x-4 p-5">
+          <div className="mt-2 flex flex-col space-x-4 p-5 md:flex-row lg:flex-row">
             <div className="flex-grow">
               <label className="block text-sm font-medium text-gray-900 dark:text-gray-300">
                 Couleur du haut
