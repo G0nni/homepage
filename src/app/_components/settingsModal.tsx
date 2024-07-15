@@ -103,6 +103,7 @@ export function SettingsModal() {
     { id: "general", name: "Général" },
     { id: "theme", name: "Thème" },
     { id: "about", name: "À propos" },
+    { id: "reset", name: "Reset" },
   ];
 
   const handleSaveImage = () => {
@@ -154,6 +155,27 @@ export function SettingsModal() {
         );
       case "about":
         return <AboutSection />;
+      case "reset":
+        return (
+          <div>
+            <p>Voulez vous réinitialiser les paramètres ?</p>
+            <button
+              onClick={() => {
+                if (
+                  window.confirm(
+                    "Êtes-vous sûr de vouloir réinitialiser tous les paramètres ?",
+                  )
+                ) {
+                  localStorage.clear();
+                  window.location.reload();
+                }
+              }}
+              className="mt-4 rounded-md bg-red-500 px-4 py-2 text-white"
+            >
+              Réinitialiser
+            </button>
+          </div>
+        );
       default:
         return <p>Contenu par défaut</p>;
     }

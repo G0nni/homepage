@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 
 export function BackgroundGradient() {
-  const [topColor, setTopColor] = useState("#ffffff"); // Couleur par défaut pour le haut
-  const [bottomColor, setBottomColor] = useState("#000000"); // Couleur par défaut pour le bas
+  const [topColor, setTopColor] = useState("#035d80"); // Couleur par défaut pour le haut
+  const [bottomColor, setBottomColor] = useState("#aab9af"); // Couleur par défaut pour le bas
 
   useEffect(() => {
     const initialStorageCheck = () => {
