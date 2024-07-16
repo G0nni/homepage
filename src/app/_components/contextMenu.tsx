@@ -20,7 +20,7 @@ export function ContextMenu({
   onDelete,
 }: ContextMenuProps) {
   const [editMode, setEditMode] = useState(false);
-  const [newName, setNewName] = useState(target || "");
+  const [newName, setNewName] = useState(target ?? "");
 
   const handleEdit = () => {
     onEdit(newName);

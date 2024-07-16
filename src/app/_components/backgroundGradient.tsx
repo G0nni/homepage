@@ -1,48 +1,112 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
+// Interface pour définir la structure des données des couleurs vibrantes
+interface ColorDataVibrant {
+  rgb: number[];
+  population: number;
+}
+
+// Type pour définir la structure des données des couleurs de base
+type ColorData = {
+  hex: string;
+  rgb: {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+  };
+  hsv: {
+    h: number;
+    s: number;
+    v: number;
+    a: number;
+  };
+};
+
+// Fonction de validation pour les données de couleurs vibrantes
+function isValidColorVibrantData(obj: unknown): obj is ColorDataVibrant {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    Array.isArray((obj as ColorDataVibrant).rgb) &&
+    (obj as ColorDataVibrant).rgb.length === 3 &&
+    (obj as ColorDataVibrant).rgb.every(
+      (value: unknown) => typeof value === "number",
+    ) &&
+    typeof (obj as ColorDataVibrant).population === "number"
+  );
+}
+
+// Fonction de validation pour les données de couleurs de base
+function isValidColorData(obj: unknown): obj is ColorData {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    typeof (obj as ColorData).hex === "string" &&
+    typeof (obj as ColorData).rgb === "object" &&
+    typeof (obj as ColorData).hsv === "object"
+  );
+}
+
+// Composant BackgroundGradient
 export function BackgroundGradient() {
-  const [topColor, setTopColor] = useState("#035d80"); // Couleur par défaut pour le haut
-  const [bottomColor, setBottomColor] = useState("#aab9af"); // Couleur par défaut pour le bas
+  const [topColor, setTopColor] = useState<string>("#035d80");
+  const [bottomColor, setBottomColor] = useState<string>("#aab9af");
 
   useEffect(() => {
     const initialStorageCheck = () => {
       const autoThemeEnabled = localStorage.getItem("autoThemeEnabled");
 
       if (autoThemeEnabled === "true") {
-        const storedTopColor = localStorage.getItem("lightVibrant");
-        const storedBottomColor = localStorage.getItem("darkVibrant");
+        const storedLightVibrant = localStorage.getItem("lightVibrant");
+        const storedDarkVibrant = localStorage.getItem("darkVibrant");
 
-        if (storedTopColor && storedBottomColor) {
-          const lightVibrant = JSON.parse(storedTopColor);
-          const darkVibrant = JSON.parse(storedBottomColor);
+        if (storedLightVibrant && storedDarkVibrant) {
+          const lightVibrant: unknown = JSON.parse(storedLightVibrant);
+          const darkVibrant: unknown = JSON.parse(storedDarkVibrant);
 
-          const topColorRgb = lightVibrant.rgb;
-          const bottomColorRgb = darkVibrant.rgb;
+          if (
+            isValidColorVibrantData(lightVibrant) &&
+            isValidColorVibrantData(darkVibrant)
+          ) {
+            const topColorRgb = lightVibrant.rgb;
+            const bottomColorRgb = darkVibrant.rgb;
 
-          const topColorCss = `rgb(${topColorRgb.join(",")})`;
-          const bottomColorCss = `rgb(${bottomColorRgb.join(",")})`;
-          const gradientCss = `linear-gradient(${topColorCss}, ${bottomColorCss})`;
+            const topColorCss = `rgb(${topColorRgb.join(",")})`;
+            const bottomColorCss = `rgb(${bottomColorRgb.join(",")})`;
+            const gradientCss = `linear-gradient(${topColorCss}, ${bottomColorCss})`;
 
-          document.body.style.background = gradientCss;
+            document.body.style.background = gradientCss;
 
-          // Mettre à jour l'état local si nécessaire
-          setTopColor(topColorCss);
-          setBottomColor(bottomColorCss);
+            // Mettre à jour l'état local si nécessaire
+            setTopColor(topColorCss);
+            setBottomColor(bottomColorCss);
+          }
         }
       } else {
         const storedTopColor = localStorage.getItem("topColor");
         const storedBottomColor = localStorage.getItem("bottomColor");
 
         if (storedTopColor && storedBottomColor) {
-          const topColorHex = JSON.parse(storedTopColor).hex;
-          const bottomColorHex = JSON.parse(storedBottomColor).hex;
+          const parsedTopColor: unknown = JSON.parse(storedTopColor);
+          const parsedBottomColor: unknown = JSON.parse(storedBottomColor);
 
-          document.body.style.background = `linear-gradient(${topColorHex}, ${bottomColorHex})`;
+          if (
+            isValidColorData(parsedTopColor) &&
+            isValidColorData(parsedBottomColor)
+          ) {
+            const newTopColor = parsedTopColor.hex ?? topColor;
+            const newBottomColor = parsedBottomColor.hex ?? bottomColor;
 
-          // Mettre à jour l'état local si nécessaire
-          setTopColor(topColorHex);
-          setBottomColor(bottomColorHex);
+            document.body.style.background = `linear-gradient(${newTopColor}, ${newBottomColor})`;
+
+            // Mettre à jour l'état local si nécessaire
+            setTopColor(newTopColor);
+            setBottomColor(newBottomColor);
+          }
+        } else {
+          document.body.style.background = `linear-gradient(${topColor}, ${bottomColor})`;
         }
       }
     };
@@ -53,39 +117,55 @@ export function BackgroundGradient() {
       const autoThemeEnabled = localStorage.getItem("autoThemeEnabled");
 
       if (autoThemeEnabled === "true") {
-        const storedTopColor = localStorage.getItem("lightVibrant");
-        const storedBottomColor = localStorage.getItem("darkVibrant");
+        const storedLightVibrant = localStorage.getItem("lightVibrant");
+        const storedDarkVibrant = localStorage.getItem("darkVibrant");
 
-        if (storedTopColor && storedBottomColor) {
-          const lightVibrant = JSON.parse(storedTopColor);
-          const darkVibrant = JSON.parse(storedBottomColor);
+        if (storedLightVibrant && storedDarkVibrant) {
+          const lightVibrant: unknown = JSON.parse(storedLightVibrant);
+          const darkVibrant: unknown = JSON.parse(storedDarkVibrant);
 
-          const topColorRgb = lightVibrant.rgb;
-          const bottomColorRgb = darkVibrant.rgb;
+          if (
+            isValidColorVibrantData(lightVibrant) &&
+            isValidColorVibrantData(darkVibrant)
+          ) {
+            const topColorRgb = lightVibrant.rgb;
+            const bottomColorRgb = darkVibrant.rgb;
 
-          const topColorCss = `rgb(${topColorRgb.join(",")})`;
-          const bottomColorCss = `rgb(${bottomColorRgb.join(",")})`;
-          const gradientCss = `linear-gradient(${topColorCss}, ${bottomColorCss})`;
+            const topColorCss = `rgb(${topColorRgb.join(",")})`;
+            const bottomColorCss = `rgb(${bottomColorRgb.join(",")})`;
+            const gradientCss = `linear-gradient(${topColorCss}, ${bottomColorCss})`;
 
-          document.body.style.background = gradientCss;
+            document.body.style.background = gradientCss;
 
-          // Mettre à jour l'état local si nécessaire
-          setTopColor(topColorCss);
-          setBottomColor(bottomColorCss);
+            // Mettre à jour l'état local si nécessaire
+            setTopColor(topColorCss);
+            setBottomColor(bottomColorCss);
+          }
         }
       } else {
-        const newTopColor =
-          JSON.parse(localStorage.getItem("topColor") ?? "null")?.hex ??
-          topColor;
-        const newBottomColor =
-          JSON.parse(localStorage.getItem("bottomColor") ?? "null")?.hex ??
-          bottomColor;
+        const storedTopColor = localStorage.getItem("topColor");
+        const storedBottomColor = localStorage.getItem("bottomColor");
 
-        document.body.style.background = `linear-gradient(${newTopColor}, ${newBottomColor})`;
+        if (storedTopColor && storedBottomColor) {
+          const parsedTopColor: unknown = JSON.parse(storedTopColor);
+          const parsedBottomColor: unknown = JSON.parse(storedBottomColor);
 
-        // Mettre à jour l'état local si nécessaire
-        setTopColor(newTopColor);
-        setBottomColor(newBottomColor);
+          if (
+            isValidColorData(parsedTopColor) &&
+            isValidColorData(parsedBottomColor)
+          ) {
+            const newTopColor = parsedTopColor.hex ?? topColor;
+            const newBottomColor = parsedBottomColor.hex ?? bottomColor;
+
+            document.body.style.background = `linear-gradient(${newTopColor}, ${newBottomColor})`;
+
+            // Mettre à jour l'état local si nécessaire
+            setTopColor(newTopColor);
+            setBottomColor(newBottomColor);
+          }
+        } else {
+          document.body.style.background = `linear-gradient(${topColor}, ${bottomColor})`;
+        }
       }
     };
 

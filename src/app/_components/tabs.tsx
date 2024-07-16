@@ -3,8 +3,8 @@ import React, {
   useState,
   useEffect,
   useRef,
-  MouseEvent,
-  WheelEvent,
+  type MouseEvent,
+  type WheelEvent,
 } from "react";
 import { ModalAddLink } from "./modalAddLink";
 import { ModalAddTab } from "./modalAddTab";
@@ -64,13 +64,49 @@ export function Tabs() {
   ]);
 
   useEffect(() => {
+    const isValidLink = (link: unknown): link is Link => {
+      return (
+        typeof link === "object" &&
+        link !== null &&
+        "href" in link &&
+        typeof (link as Link).href === "string" &&
+        "logo" in link &&
+        typeof (link as Link).logo === "string" &&
+        "alt" in link &&
+        typeof (link as Link).alt === "string"
+      );
+    };
+
+    const isValidTab = (tab: unknown): tab is Tab => {
+      return (
+        typeof tab === "object" &&
+        tab !== null &&
+        "name" in tab &&
+        typeof (tab as Tab).name === "string" &&
+        "links" in tab &&
+        Array.isArray((tab as Tab).links) &&
+        (tab as Tab).links.every(isValidLink)
+      );
+    };
+    const isValidTabs = (tabs: unknown): tabs is Tab[] => {
+      return Array.isArray(tabs) && tabs.every(isValidTab);
+    };
     const savedTabs = localStorage.getItem("tabs");
     if (savedTabs) {
-      setTabs(JSON.parse(savedTabs));
+      try {
+        const parsedTabs: unknown = JSON.parse(savedTabs);
+        if (isValidTabs(parsedTabs)) {
+          setTabs(parsedTabs);
+        } else {
+          console.error("Invalid tabs data in localStorage");
+        }
+      } catch (error) {
+        console.error("Error parsing tabs from localStorage", error);
+      }
     }
   }, []);
 
-  const [activeTab, setActiveTab] = useState<string>(tabs[0]?.name || "Home");
+  const [activeTab, setActiveTab] = useState<string>(tabs[0]?.name ?? "Home");
   const [isSliderMode, setIsSliderMode] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);

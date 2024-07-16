@@ -19,7 +19,7 @@ export function ImageContainer() {
     }
 
     const handleStorageChange = () => {
-      const newImage = localStorage.getItem("themeImage") || defaultImage.src;
+      const newImage = localStorage.getItem("themeImage") ?? defaultImage.src;
       setImage(newImage);
     };
 

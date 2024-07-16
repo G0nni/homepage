@@ -1,40 +1,63 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { ColorPicker, useColor } from "react-color-palette";
+import React, { useEffect } from "react";
+import { ColorPicker, useColor, type IColor } from "react-color-palette";
 import "react-color-palette/css";
 
 interface ThemeSelectorProps {
-  selectedTheme: string;
-  handleThemeChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   handleAutoThemeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isAutoThemeEnabled: boolean;
 }
 
 const ThemeSelector: React.FC<ThemeSelectorProps> = ({
-  selectedTheme,
-  handleThemeChange,
   handleAutoThemeChange,
   isAutoThemeEnabled,
 }) => {
-  const [topColor, setTopColor] = useColor("#121212");
-  const [bottomColor, setBottomColor] = useColor("#121212");
-  const [isSaved, setIsSaved] = useState(false);
+  const [topColor, setTopColor] = useColor("#035d80");
+  const [bottomColor, setBottomColor] = useColor("#aab9af");
+
+  const isValidColor = (color: unknown): color is IColor => {
+    if (typeof color !== "object" || color === null) return false;
+    const colorObj = color as IColor;
+    return (
+      typeof colorObj.hex === "string" &&
+      typeof colorObj.rgb === "object" &&
+      typeof colorObj.rgb.r === "number" &&
+      typeof colorObj.rgb.g === "number" &&
+      typeof colorObj.rgb.b === "number" &&
+      typeof colorObj.rgb.a === "number" &&
+      typeof colorObj.hsv === "object" &&
+      typeof colorObj.hsv.h === "number" &&
+      typeof colorObj.hsv.s === "number" &&
+      typeof colorObj.hsv.v === "number" &&
+      typeof colorObj.hsv.a === "number"
+    );
+  };
 
   useEffect(() => {
     const storedTopColor = localStorage.getItem("topColor");
     const storedBottomColor = localStorage.getItem("bottomColor");
 
     if (storedTopColor && storedBottomColor) {
-      setTopColor(JSON.parse(storedTopColor));
-      setBottomColor(JSON.parse(storedBottomColor));
+      try {
+        const parsedTopColor: unknown = JSON.parse(storedTopColor);
+        const parsedBottomColor: unknown = JSON.parse(storedBottomColor);
+        if (isValidColor(parsedTopColor) && isValidColor(parsedBottomColor)) {
+          setTopColor(parsedTopColor);
+          setBottomColor(parsedBottomColor);
+          console.log("Colors loaded from localStorage");
+        } else {
+          console.error("Parsed colors are not valid IColor objects");
+        }
+      } catch (error) {
+        console.error("Error parsing colors from localStorage", error);
+      }
     }
-  }, []);
+  }, [setTopColor, setBottomColor]);
 
   const handleSave = () => {
     localStorage.setItem("topColor", JSON.stringify(topColor));
     localStorage.setItem("bottomColor", JSON.stringify(bottomColor));
     window.dispatchEvent(new Event("storage"));
-    setIsSaved(true);
   };
 
   return (
@@ -58,7 +81,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({
             htmlFor="autoTheme"
             className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
           >
-            Changer le thème en fonction de l'image sélectionnée
+            Changer le thème en fonction de l&apos;image sélectionnée
           </label>
         </div>
         {!isAutoThemeEnabled ? (

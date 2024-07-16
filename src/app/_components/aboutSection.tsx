@@ -3,14 +3,14 @@ import React from "react";
 const AboutSection: React.FC = () => {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">À propos de l'application</h3>
+      <h3 className="text-lg font-semibold">À propos de l&apos;application</h3>
       <p>
         <strong>Version:</strong> 1.0.0
       </p>
       <p>
-        <strong>Description:</strong> Cette application sert de page d'accueil
-        pour navigateur, offrant des fonctionnalités avancées pour améliorer
-        votre expérience en ligne.
+        <strong>Description:</strong> Cette application sert de page
+        d&apos;accueil pour navigateur, offrant des fonctionnalités avancées
+        pour améliorer votre expérience en ligne.
       </p>
       <p>
         <strong>Fonctionnalités:</strong>

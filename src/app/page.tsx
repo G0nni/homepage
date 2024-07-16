@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 import { getServerAuthSession } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
@@ -11,9 +10,6 @@ import { BackgroundGradient } from "./_components/backgroundGradient";
 
 export default async function Home() {
   const session = await getServerAuthSession();
-
-  const color1 = "#035d80";
-  const color2 = "#aab9af";
 
   return (
     <HydrateClient>

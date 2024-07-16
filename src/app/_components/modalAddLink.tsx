@@ -8,15 +8,6 @@ type ModalPropsType = {
   setNewLinkAlt: (value: string) => void;
 };
 
-export const ModalProps: ModalPropsType = {
-  setIsModalOpen: () => {},
-  handleAddLink: () => {},
-  newLinkHref: "",
-  setNewLinkHref: () => {},
-  newLinkAlt: "",
-  setNewLinkAlt: () => {},
-};
-
 export function ModalAddLink({
   setIsModalOpen,
   handleAddLink,
