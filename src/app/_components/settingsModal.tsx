@@ -5,12 +5,22 @@ import Vibrant from "node-vibrant";
 import ImageUploader from "./imageUploader";
 import ThemeSelector from "./themeSelector";
 import AboutSection from "./aboutSection";
+import SearchEngine from "./searchEngineSelector";
+
+interface SearchEngine {
+  name: string;
+  url: string;
+}
 
 export function SettingsModal() {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
   const [isAutoThemeEnabled, setIsAutoThemeEnabled] = useState(false);
+  const [searchEngine, setSearchEngine] = useState({
+    name: "Google",
+    url: "https://google.com/search",
+  });
 
   useEffect(() => {
     const storedImage = localStorage.getItem("themeImage");
@@ -25,6 +35,23 @@ export function SettingsModal() {
     // If auto theme is enabled, attempt to extract and store colors
     if (isAutoEnabled) {
       extractAndStoreColors();
+    }
+
+    const storedSearchEngine = localStorage.getItem("searchEngine");
+    if (storedSearchEngine) {
+      try {
+        const parsedEngine: unknown = JSON.parse(storedSearchEngine);
+        if (
+          typeof parsedEngine === "object" &&
+          parsedEngine !== null &&
+          "name" in parsedEngine &&
+          "url" in parsedEngine
+        ) {
+          setSearchEngine(parsedEngine as SearchEngine);
+        }
+      } catch (error) {
+        console.error("Failed to parse search engine from localStorage", error);
+      }
     }
   }, []);
 
@@ -124,7 +151,15 @@ export function SettingsModal() {
   const renderTabContent = () => {
     switch (activeTab) {
       case "general":
-        return <p>Contenu Général</p>;
+        return (
+          <div className="flex flex-col gap-10">
+            <p>Personnalisez vos paramètres ici</p>
+            <SearchEngine
+              searchEngine={searchEngine}
+              setSearchEngine={setSearchEngine}
+            />
+          </div>
+        );
       case "theme":
         return (
           <div className="max-h-full overflow-y-auto">
