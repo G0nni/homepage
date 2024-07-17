@@ -35,15 +35,15 @@ const SearchEngineSelector: React.FC<SearchEngineSelectorProps> = ({
   };
 
   return (
-    <div>
-      <label htmlFor="searchEngine" className="mb-2 block">
+    <div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
+      <label htmlFor="searchEngine" className="mb-2 block text-base">
         Sélectionner votre moteur de recherche:
       </label>
       <select
         id="searchEngine"
         value={searchEngine.name}
         onChange={handleChange}
-        className="rounded-md border p-2"
+        className="rounded-md border p-2 text-sm sm:text-base"
       >
         {searchEngines.map((engine) => (
           <option key={engine.name} value={engine.name}>

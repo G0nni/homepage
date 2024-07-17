@@ -36,13 +36,13 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
             onClick={() =>
               setImagePreviewUrl(localStorage.getItem("themeImage") ?? "")
             }
-            className="w-full rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="w-full rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 focus:outline-none"
           >
             Supprimer l&apos;image
           </button>
           <button
             onClick={handleSaveImage}
-            className="w-full rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:outline-none"
           >
             Sauvegarder
           </button>
