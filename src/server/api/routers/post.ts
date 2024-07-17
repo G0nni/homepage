@@ -7,20 +7,18 @@ import {
 } from "~/server/api/trpc";
 
 export const postRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
-    }),
-
   create: protectedProcedure
     .input(z.object({ name: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
-      // simulate a slow db call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Check if the user already has a post
+      const existingPost = await ctx.db.post.findFirst({
+        where: { createdBy: { id: ctx.session.user.id } },
+      });
+      if (existingPost) {
+        throw new Error("User already has a post");
+      }
 
+      // Proceed with creating a new post
       return ctx.db.post.create({
         data: {
           name: input.name,
@@ -35,8 +33,34 @@ export const postRouter = createTRPCRouter({
       where: { createdBy: { id: ctx.session.user.id } },
     });
   }),
+  update: protectedProcedure
+    .input(z.object({ id: z.number(), name: z.string().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.post.update({
+        where: { id: input.id },
+        data: { name: input.name },
+      });
+    }),
 
-  getSecretMessage: protectedProcedure.query(() => {
-    return "you can now see this secret message!";
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.post.delete({
+        where: { id: input.id },
+      });
+    }),
+
+  getByUser: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.post.findFirst({
+      where: { createdBy: { id: ctx.session.user.id } },
+    });
+  }),
+
+  getRandom: publicProcedure.query(async ({ ctx }) => {
+    const count = await ctx.db.post.count();
+    const randomRowNumber = Math.floor(Math.random() * count);
+    return ctx.db.post.findFirst({
+      skip: randomRowNumber,
+    });
   }),
 });

@@ -37,7 +37,7 @@ const SearchEngineSelector: React.FC<SearchEngineSelectorProps> = ({
   return (
     <div>
       <label htmlFor="searchEngine" className="mb-2 block">
-        Sélectionner le moteur de recherche:
+        Sélectionner votre moteur de recherche:
       </label>
       <select
         id="searchEngine"

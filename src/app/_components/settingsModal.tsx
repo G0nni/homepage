@@ -1,18 +1,31 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 
 import Vibrant from "node-vibrant";
 import ImageUploader from "./imageUploader";
 import ThemeSelector from "./themeSelector";
 import AboutSection from "./aboutSection";
 import SearchEngine from "./searchEngineSelector";
+import { Post } from "./post";
 
 interface SearchEngine {
   name: string;
   url: string;
 }
 
-export function SettingsModal() {
+type Session = {
+  user: {
+    id: string;
+    [key: string]: any; // Assuming there might be more properties in the user object
+  };
+  [key: string]: any; // Assuming the session object might contain more properties
+};
+interface SettingsModalProps {
+  session: Session | null;
+}
+
+export function SettingsModal({ session }: SettingsModalProps) {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
@@ -153,11 +166,14 @@ export function SettingsModal() {
       case "general":
         return (
           <div className="flex flex-col gap-10">
-            <p>Personnalisez vos paramètres ici</p>
+            <h3 className="text-lg font-semibold">
+              Personnalisez vos paramètres ici
+            </h3>
             <SearchEngine
               searchEngine={searchEngine}
               setSearchEngine={setSearchEngine}
             />
+            <Post session={session} />
           </div>
         );
       case "theme":
@@ -237,7 +253,7 @@ export function SettingsModal() {
             >
               X
             </button>
-            <div className="w-1/6">
+            <div className="w-1/5">
               <ul>
                 {tabs.map((tab) => (
                   <li key={tab.id} className="mb-2">
@@ -253,7 +269,40 @@ export function SettingsModal() {
                 ))}
               </ul>
             </div>
-            <div className="w-5/6 p-4">{renderTabContent()}</div>
+            <div className="w-4/5 p-4">{renderTabContent()}</div>
+            {session && (
+              <div className="absolute bottom-5 left-5">
+                <Link
+                  href={"/api/auth/signout"}
+                  className="inline-flex items-center justify-center rounded-md bg-red-500/10 p-2 font-semibold no-underline transition hover:bg-red-500/20"
+                >
+                  <svg
+                    fill="#D32F2F"
+                    height="20px"
+                    width="20px"
+                    version="1.1"
+                    id="Capa_1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 384.971 384.971"
+                  >
+                    <g>
+                      <g id="Sign_Out">
+                        <path
+                          d="M180.455,360.91H24.061V24.061h156.394c6.641,0,12.03-5.39,12.03-12.03s-5.39-12.03-12.03-12.03H12.03
+                     C5.39,0.001,0,5.39,0,12.031V372.94c0,6.641,5.39,12.03,12.03,12.03h168.424c6.641,0,12.03-5.39,12.03-12.03
+                     C192.485,366.299,187.095,360.91,180.455,360.91z"
+                        />
+                        <path
+                          d="M381.481,184.088l-83.009-84.2c-4.704-4.752-12.319-4.74-17.011,0c-4.704,4.74-4.704,12.439,0,17.179l62.558,63.46H96.279
+                     c-6.641,0-12.03,5.438-12.03,12.151c0,6.713,5.39,12.151,12.03,12.151h247.74l-62.558,63.46c-4.704,4.752-4.704,12.439,0,17.179
+                     c4.704,4.752,12.319,4.752,17.011,0l82.997-84.2C386.113,196.588,386.161,188.756,381.481,184.088z"
+                        />
+                      </g>
+                    </g>
+                  </svg>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}
