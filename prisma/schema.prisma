@@ -26,10 +26,21 @@ model Post {
     @@index([name])
 }
 
-model SearchEngine {
-    id        Int      @id @default(autoincrement())
-    name      String
-    searchUrl String     
+model UserConfig {
+    id               Int      @id @default(autoincrement())
+    userId           String   @unique
+    autoThemeEnabled Boolean? // Optionnel
+    tabs             String?  // Optionnel, stocke des données JSON sous forme de chaîne
+    themeImage       String?  // Optionnel
+    searchEngine     String?  // Optionnel, stocke des données JSON sous forme de chaîne
+    topColor         String?  // Optionnel, stocke des données JSON sous forme de chaîne
+    bottomColor      String?  // Optionnel, stocke des données JSON sous forme de chaîne
+    darkVibrant      String?  // Optionnel, stocke des données JSON sous forme de chaîne
+    lightVibrant     String?  // Optionnel, stocke des données JSON sous forme de chaîne
+
+    user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
 }
 
 // Necessary for Next auth
@@ -69,6 +80,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    config        UserConfig?
 }
 
 model VerificationToken {

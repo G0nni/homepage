@@ -17,9 +17,9 @@ interface SearchEngine {
 type Session = {
   user: {
     id: string;
-    [key: string]: any; // Assuming there might be more properties in the user object
+    [key: string]: unknown; // Assuming there might be more properties in the user object
   };
-  [key: string]: any; // Assuming the session object might contain more properties
+  [key: string]: unknown; // Assuming the session object might contain more properties
 };
 interface SettingsModalProps {
   session: Session | null;
@@ -72,8 +72,6 @@ export function SettingsModal({ session }: SettingsModalProps) {
     if (isAutoThemeEnabled) {
       extractAndStoreColors();
     } else {
-      localStorage.removeItem("lightVibrant");
-      localStorage.removeItem("darkVibrant");
       window.dispatchEvent(new Event("storage"));
     }
   }, [isAutoThemeEnabled]);

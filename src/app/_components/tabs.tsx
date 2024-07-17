@@ -357,13 +357,19 @@ export function Tabs() {
               className="col-span-1"
               onContextMenu={(e) => handleContextMenu(e, "link", link.href)}
             >
-              <div className="transition-transform duration-100 ease-in hover:scale-110 hover:bg-opacity-50">
+              <div
+                className="group relative transition-transform duration-100 ease-in hover:scale-110 hover:bg-opacity-50"
+                style={{ width: "60px", height: "60px" }}
+              >
                 <img
                   src={link.logo}
                   alt={link.alt}
                   className="overflow-x-hidden rounded-md border-none bg-black bg-opacity-30 object-cover px-2 py-2"
                   style={{ width: "60px", height: "60px" }}
                 />
+                <p className="absolute left-1/2 top-[110%] -translate-x-1/2 transform text-center text-sm opacity-0 transition-opacity duration-100 ease-in-out group-hover:opacity-100">
+                  {link.alt}
+                </p>
               </div>
             </a>
           ))}

@@ -6,9 +6,9 @@ import { api } from "~/trpc/react";
 type Session = {
   user: {
     id: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 interface SettingsModalProps {
@@ -97,7 +97,9 @@ export function Post({ session }: SettingsModalProps) {
       {post ? (
         <p className="text-gray-700">Votre phase : {post.name}</p>
       ) : (
-        <p className="text-gray-700">Vous n'avez pas encore posté de phrase.</p>
+        <p className="text-gray-700">
+          Vous n&apos;avez pas encore posté de phrase.
+        </p>
       )}
       <form
         onSubmit={(e) => {

@@ -8,21 +8,30 @@ import { SettingsModal } from "./_components/settingsModal";
 import { ImageContainer } from "./_components/imageContainer";
 import { BackgroundGradient } from "./_components/backgroundGradient";
 import { SearchBar } from "./_components/searchbar";
-
+import { SyncModule } from "./_components/syncModule";
+type Session = {
+  user: {
+    id: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+};
 export default async function Home() {
-  const session = await getServerAuthSession();
+  const session: Session | null =
+    (await getServerAuthSession()) as Session | null;
 
   const randomPost = await api.post.getRandom();
 
   return (
     <HydrateClient>
       <BackgroundGradient />
+      <SyncModule session={session} />
       <main
         className={`flex min-h-screen items-start justify-center text-white md:items-center lg:items-center`}
       >
         <div className="absolute right-5 top-5 flex items-center gap-4">
           <p className="text-normal text-center text-white">
-            {session && <span>Bienvenue {session.user?.name} !</span>}
+            {session && <span>Bienvenue {session.user?.name as string} !</span>}
           </p>
           {!session && (
             <Link
@@ -42,7 +51,7 @@ export default async function Home() {
               {randomPost ? (
                 <p className="text-sm">{randomPost.name}</p>
               ) : (
-                <p className="text-sm"></p>
+                <p className="text-sm">Bienvenue !</p>
               )}
               <RealTimeHour />
               <SearchBar />
