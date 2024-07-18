@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { api } from "~/trpc/react";
 
 type Session = {
@@ -31,94 +31,82 @@ export function SyncModule({ session }: SyncModuleProps) {
   const [serverUserConfig, setServerUserConfig] = useState<UserConfig | null>(
     null,
   );
-  const [isConfigLoaded, setIsConfigLoaded] = useState(false);
-  const isInitialLoad = useRef(true);
 
   const createConfig = api.userConfig.create.useMutation({
     onSuccess: () => {
-      console.log("creation success");
+      console.log("Creation success");
+      // Après la création réussie, vous pouvez refetch les données si nécessaire
+      void fetchServerConfig.refetch();
     },
   });
 
   const updateConfig = api.userConfig.update.useMutation({
     onSuccess: () => {
-      console.log("update success");
+      console.log("Update success");
+      // Après la mise à jour réussie, vous pouvez refetch les données si nécessaire
+      void fetchServerConfig.refetch();
     },
   });
 
   const fetchServerConfig = api.userConfig.getByUserId.useQuery(
-    { userId: session?.user.id || "" },
+    { userId: session?.user.id ?? "" },
     { enabled: !!session?.user.id },
   );
 
   useEffect(() => {
     if (fetchServerConfig.data) {
       setServerUserConfig(fetchServerConfig.data);
-      if (!isLocalStorageConfigPresent()) {
-        syncServerToLocalStorage(fetchServerConfig.data);
-      }
-      setIsConfigLoaded(true);
+      // Synchroniser les données du serveur vers le local storage si nécessaire
+      syncServerToLocalStorage(fetchServerConfig.data);
     }
   }, [fetchServerConfig.data]);
 
-  const isLocalStorageConfigPresent = () => {
-    return localStorage.getItem("autoThemeEnabled") !== null;
-  };
-
-  const syncServerToLocalStorage = (config: UserConfig) => {
-    if (!session || !config) return;
-    localStorage.setItem(
-      "autoThemeEnabled",
-      JSON.stringify(config.autoThemeEnabled),
-    );
-    localStorage.setItem("tabs", config.tabs || "");
-    localStorage.setItem("themeImage", config.themeImage || "");
-    localStorage.setItem("searchEngine", config.searchEngine || "");
-    localStorage.setItem("topColor", config.topColor || "");
-    localStorage.setItem("bottomColor", config.bottomColor || "");
-    localStorage.setItem("darkVibrant", config.darkVibrant || "");
-    localStorage.setItem("lightVibrant", config.lightVibrant || "");
-
-    window.location.reload();
-  };
-
   useEffect(() => {
-    if (session && isInitialLoad.current) {
-      const autoThemeEnabled = localStorage.getItem("autoThemeEnabled");
-      const tabs = localStorage.getItem("tabs");
-      const themeImage = localStorage.getItem("themeImage");
-      const searchEngine = localStorage.getItem("searchEngine");
-      const topColor = localStorage.getItem("topColor");
-      const bottomColor = localStorage.getItem("bottomColor");
-      const darkVibrant = localStorage.getItem("darkVibrant");
-      const lightVibrant = localStorage.getItem("lightVibrant");
+    const syncStorageCheck = () => {
+      if (session) {
+        const autoThemeEnabled = localStorage.getItem("autoThemeEnabled");
+        const tabs = localStorage.getItem("tabs");
+        const themeImage = localStorage.getItem("themeImage");
+        const searchEngine = localStorage.getItem("searchEngine");
+        const topColor = localStorage.getItem("topColor");
+        const bottomColor = localStorage.getItem("bottomColor");
+        const darkVibrant = localStorage.getItem("darkVibrant");
+        const lightVibrant = localStorage.getItem("lightVibrant");
 
-      setUserConfig({
-        userId: session.user.id,
-        autoThemeEnabled: autoThemeEnabled
-          ? JSON.parse(autoThemeEnabled)
-          : null,
-        tabs: tabs || "",
-        themeImage: themeImage || "",
-        searchEngine: searchEngine || "",
-        topColor: topColor || "",
-        bottomColor: bottomColor || "",
-        darkVibrant: darkVibrant || "",
-        lightVibrant: lightVibrant || "",
-      });
-      isInitialLoad.current = false;
-    }
+        setUserConfig({
+          userId: session.user.id,
+          autoThemeEnabled: autoThemeEnabled
+            ? (JSON.parse(autoThemeEnabled) as boolean)
+            : false,
+          tabs: tabs ?? "",
+          themeImage: themeImage ?? "",
+          searchEngine: searchEngine ?? "",
+          topColor: topColor ?? "",
+          bottomColor: bottomColor ?? "",
+          darkVibrant: darkVibrant ?? "",
+          lightVibrant: lightVibrant ?? "",
+        });
+      }
+    };
+
+    syncStorageCheck();
+    window.addEventListener("storage", syncStorageCheck);
+
+    return () => {
+      window.removeEventListener("storage", syncStorageCheck);
+    };
   }, [session]);
 
   useEffect(() => {
-    if (isConfigLoaded && userConfig !== null) {
+    if (userConfig !== null) {
       handleSync();
     }
-  }, [userConfig, isConfigLoaded]);
+  }, [userConfig]);
 
   const handleSync = () => {
     if (session && userConfig) {
       if (serverUserConfig) {
+        // Comparer les configurations locales et serveur et mettre à jour si nécessaire
         if (
           userConfig.autoThemeEnabled !== serverUserConfig.autoThemeEnabled ||
           userConfig.tabs !== serverUserConfig.tabs ||
@@ -142,6 +130,7 @@ export function SyncModule({ session }: SyncModuleProps) {
           });
         }
       } else {
+        // Créer une nouvelle configuration si aucune n'existe côté serveur
         createConfig.mutate({
           autoThemeEnabled: userConfig.autoThemeEnabled ?? undefined,
           tabs: userConfig.tabs ?? undefined,
@@ -156,50 +145,20 @@ export function SyncModule({ session }: SyncModuleProps) {
     }
   };
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      if (session) {
-        const autoThemeEnabled = localStorage.getItem("autoThemeEnabled");
-        const tabs = localStorage.getItem("tabs");
-        const themeImage = localStorage.getItem("themeImage");
-        const searchEngine = localStorage.getItem("searchEngine");
-        const topColor = localStorage.getItem("topColor");
-        const bottomColor = localStorage.getItem("bottomColor");
-        const darkVibrant = localStorage.getItem("darkVibrant");
-        const lightVibrant = localStorage.getItem("lightVibrant");
+  const syncServerToLocalStorage = (config: UserConfig) => {
+    if (!session || !config) return;
+    localStorage.setItem(
+      "autoThemeEnabled",
+      JSON.stringify(config.autoThemeEnabled),
+    );
+    localStorage.setItem("tabs", config.tabs ?? "");
+    localStorage.setItem("themeImage", config.themeImage ?? "");
+    localStorage.setItem("searchEngine", config.searchEngine ?? "");
+    localStorage.setItem("topColor", config.topColor ?? "");
+    localStorage.setItem("bottomColor", config.bottomColor ?? "");
+    localStorage.setItem("darkVibrant", config.darkVibrant ?? "");
+    localStorage.setItem("lightVibrant", config.lightVibrant ?? "");
+  };
 
-        const newConfig: UserConfig = {
-          userId: session.user.id,
-          autoThemeEnabled: autoThemeEnabled
-            ? JSON.parse(autoThemeEnabled)
-            : null,
-          tabs: tabs || "",
-          themeImage: themeImage || "",
-          searchEngine: searchEngine || "",
-          topColor: topColor || "",
-          bottomColor: bottomColor || "",
-          darkVibrant: darkVibrant || "",
-          lightVibrant: lightVibrant || "",
-        };
-
-        setUserConfig(newConfig);
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, [session]);
-
-  return (
-    <div>
-      <h1>SyncModule</h1>
-      <div>
-        <h2>userConfig</h2>
-        <pre>{JSON.stringify(userConfig, null, 2)}</pre>
-      </div>
-    </div>
-  );
+  return <></>;
 }
