@@ -91,6 +91,7 @@ export function Tabs() {
     const isValidTabs = (tabs: unknown): tabs is Tab[] => {
       return Array.isArray(tabs) && tabs.every(isValidTab);
     };
+
     const savedTabs = localStorage.getItem("tabs");
     if (savedTabs) {
       try {
@@ -140,6 +141,8 @@ export function Tabs() {
 
     checkIfOverflow();
     window.addEventListener("resize", checkIfOverflow);
+
+    window.dispatchEvent(new Event("storage"));
 
     return () => window.removeEventListener("resize", checkIfOverflow);
   }, [tabs]);

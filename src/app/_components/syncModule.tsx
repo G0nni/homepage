@@ -158,7 +158,9 @@ export function SyncModule({ session }: SyncModuleProps) {
     localStorage.setItem("bottomColor", config.bottomColor ?? "");
     localStorage.setItem("darkVibrant", config.darkVibrant ?? "");
     localStorage.setItem("lightVibrant", config.lightVibrant ?? "");
+
+    window.dispatchEvent(new Event("storage"));
   };
 
-  return <></>;
+  return null;
 }
