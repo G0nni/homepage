@@ -335,7 +335,7 @@ export function Tabs() {
             key={index}
             className={`${
               tab.name === activeTab ? "bg-opacity-50" : ""
-            } whitespace-nowrap rounded-md bg-black bg-opacity-30 px-5 py-2`}
+            } whitespace-nowrap rounded-md bg-black bg-opacity-30 px-5 py-2 hover:bg-opacity-50`}
             onClick={() => setActiveTab(tab.name)}
             onContextMenu={(e) => handleContextMenu(e, "tab", tab.name)}
           >
@@ -343,7 +343,7 @@ export function Tabs() {
           </button>
         ))}
         <button
-          className="text-normal rounded-md bg-black bg-opacity-30 px-5 py-2 transition-transform duration-100 ease-in hover:scale-110"
+          className="text-normal rounded-md bg-black bg-opacity-30 px-5 py-2 hover:bg-opacity-50"
           onClick={() => setIsTabModalOpen(true)}
         >
           +
@@ -361,7 +361,7 @@ export function Tabs() {
               onContextMenu={(e) => handleContextMenu(e, "link", link.href)}
             >
               <div
-                className="group relative transition-transform duration-100 ease-in hover:scale-110 hover:bg-opacity-50"
+                className="group relative transition-transform duration-100 ease-in hover:z-10 hover:scale-110 hover:bg-opacity-50"
                 style={{ width: "60px", height: "60px" }}
               >
                 <img
@@ -370,7 +370,7 @@ export function Tabs() {
                   className="overflow-x-hidden rounded-md border-none bg-black bg-opacity-30 object-cover px-2 py-2"
                   style={{ width: "60px", height: "60px" }}
                 />
-                <p className="absolute left-1/2 top-[110%] -translate-x-1/2 transform text-center text-sm opacity-0 transition-opacity duration-100 ease-in-out group-hover:opacity-100">
+                <p className="pointer-events-none absolute left-1/2 top-[110%] -translate-x-1/2 transform text-center text-sm opacity-0 transition-opacity duration-100 ease-in-out group-hover:opacity-100">
                   {link.alt}
                 </p>
               </div>
@@ -406,7 +406,7 @@ export function Tabs() {
       )}
 
       {contextMenu.visible && (
-        <div ref={contextMenuRef}>
+        <div ref={contextMenuRef} className="z-50">
           <ContextMenu
             x={contextMenu.x}
             y={contextMenu.y}
