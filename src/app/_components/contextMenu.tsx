@@ -35,7 +35,7 @@ export function ContextMenu({
 
   return (
     <div
-      className="absolute rounded-md bg-white p-2 shadow-lg"
+      className="absolute z-50 rounded-md bg-white p-2 shadow-lg"
       style={{ top: y, left: x }}
       onClick={(e) => e.stopPropagation()}
     >

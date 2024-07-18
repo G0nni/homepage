@@ -62,6 +62,7 @@ export function Tabs() {
       ],
     },
   ]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const isValidLink = (link: unknown): link is Link => {
@@ -92,19 +93,22 @@ export function Tabs() {
       return Array.isArray(tabs) && tabs.every(isValidTab);
     };
 
-    const savedTabs = localStorage.getItem("tabs");
-    if (savedTabs) {
-      try {
-        const parsedTabs: unknown = JSON.parse(savedTabs);
-        if (isValidTabs(parsedTabs)) {
-          setTabs(parsedTabs);
-        } else {
-          console.error("Invalid tabs data in localStorage");
+    setTimeout(() => {
+      const savedTabs = localStorage.getItem("tabs");
+      if (savedTabs) {
+        try {
+          const parsedTabs: unknown = JSON.parse(savedTabs);
+          if (isValidTabs(parsedTabs)) {
+            setTabs(parsedTabs);
+          } else {
+            console.error("Invalid tabs data in localStorage");
+          }
+        } catch (error) {
+          console.error("Error parsing tabs from localStorage", error);
         }
-      } catch (error) {
-        console.error("Error parsing tabs from localStorage", error);
       }
-    }
+      setIsLoading(false);
+    }, 300);
   }, []);
 
   const [activeTab, setActiveTab] = useState<string>(tabs[0]?.name ?? "Home");
@@ -316,6 +320,33 @@ export function Tabs() {
       window.removeEventListener("click", handleOutsideClick);
     };
   }, [contextMenu.visible]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center pt-10">
+        <svg
+          className="h-8 w-8 animate-spin text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">
