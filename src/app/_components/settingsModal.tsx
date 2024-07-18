@@ -204,6 +204,7 @@ export function SettingsModal({ session }: SettingsModalProps) {
                   )
                 ) {
                   localStorage.clear();
+                  window.dispatchEvent(new Event("storage"));
                   window.location.reload();
                 }
               }}
@@ -247,9 +248,9 @@ export function SettingsModal({ session }: SettingsModalProps) {
           <div className="relative flex h-[600px] w-[800px] rounded-lg bg-white p-6 shadow-lg">
             <button
               onClick={closeSettingsModal}
-              className="absolute right-0 top-0 mr-4 mt-4 rounded-md bg-gray-200 p-2 text-gray-600 hover:bg-gray-300"
+              className="absolute right-0 top-0 mr-4 mt-4 rounded-md bg-gray-200 px-2 text-gray-600 hover:bg-gray-300"
             >
-              X
+              x
             </button>
             <div className="w-1/5">
               <ul>
