@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { api } from "~/trpc/react";
 
 type Session = {
@@ -19,7 +19,7 @@ type UserConfig = {
   bottomColor: string | null;
   darkVibrant: string | null;
   lightVibrant: string | null;
-  userId: string | null; // Add the 'userId' property
+  userId: string | null;
 };
 
 interface SyncModuleProps {
@@ -31,6 +31,8 @@ export function SyncModule({ session }: SyncModuleProps) {
   const [serverUserConfig, setServerUserConfig] = useState<UserConfig | null>(
     null,
   );
+  const [isConfigLoaded, setIsConfigLoaded] = useState(false);
+  const isInitialLoad = useRef(true);
 
   const createConfig = api.userConfig.create.useMutation({
     onSuccess: () => {
@@ -52,56 +54,69 @@ export function SyncModule({ session }: SyncModuleProps) {
   useEffect(() => {
     if (fetchServerConfig.data) {
       setServerUserConfig(fetchServerConfig.data);
+      if (!isLocalStorageConfigPresent()) {
+        syncServerToLocalStorage(fetchServerConfig.data);
+      }
+      setIsConfigLoaded(true);
     }
   }, [fetchServerConfig.data]);
 
+  const isLocalStorageConfigPresent = () => {
+    return localStorage.getItem("autoThemeEnabled") !== null;
+  };
+
+  const syncServerToLocalStorage = (config: UserConfig) => {
+    if (!session || !config) return;
+    localStorage.setItem(
+      "autoThemeEnabled",
+      JSON.stringify(config.autoThemeEnabled),
+    );
+    localStorage.setItem("tabs", config.tabs || "");
+    localStorage.setItem("themeImage", config.themeImage || "");
+    localStorage.setItem("searchEngine", config.searchEngine || "");
+    localStorage.setItem("topColor", config.topColor || "");
+    localStorage.setItem("bottomColor", config.bottomColor || "");
+    localStorage.setItem("darkVibrant", config.darkVibrant || "");
+    localStorage.setItem("lightVibrant", config.lightVibrant || "");
+
+    window.location.reload();
+  };
+
   useEffect(() => {
-    const syncStorageCheck = () => {
-      if (session) {
-        console.log("syncStorageCheck");
-        const autoThemeEnabled = localStorage.getItem("autoThemeEnabled");
-        const tabs = localStorage.getItem("tabs");
-        const themeImage = localStorage.getItem("themeImage");
-        const searchEngine = localStorage.getItem("searchEngine");
-        const topColor = localStorage.getItem("topColor");
-        const bottomColor = localStorage.getItem("bottomColor");
-        const darkVibrant = localStorage.getItem("darkVibrant");
-        const lightVibrant = localStorage.getItem("lightVibrant");
+    if (session && isInitialLoad.current) {
+      const autoThemeEnabled = localStorage.getItem("autoThemeEnabled");
+      const tabs = localStorage.getItem("tabs");
+      const themeImage = localStorage.getItem("themeImage");
+      const searchEngine = localStorage.getItem("searchEngine");
+      const topColor = localStorage.getItem("topColor");
+      const bottomColor = localStorage.getItem("bottomColor");
+      const darkVibrant = localStorage.getItem("darkVibrant");
+      const lightVibrant = localStorage.getItem("lightVibrant");
 
-        setUserConfig({
-          userId: session.user.id,
-          autoThemeEnabled: autoThemeEnabled
-            ? JSON.parse(autoThemeEnabled)
-            : false,
-          tabs: tabs || "",
-          themeImage: themeImage || "",
-          searchEngine: searchEngine || "",
-          topColor: topColor || "",
-          bottomColor: bottomColor || "",
-          darkVibrant: darkVibrant || "",
-          lightVibrant: lightVibrant || "",
-        });
-      } else {
-        console.log("syncStorageCheck: No session");
-      }
-    };
-
-    syncStorageCheck();
-    window.addEventListener("storage", syncStorageCheck);
-
-    return () => {
-      window.removeEventListener("storage", syncStorageCheck);
-    };
+      setUserConfig({
+        userId: session.user.id,
+        autoThemeEnabled: autoThemeEnabled
+          ? JSON.parse(autoThemeEnabled)
+          : null,
+        tabs: tabs || "",
+        themeImage: themeImage || "",
+        searchEngine: searchEngine || "",
+        topColor: topColor || "",
+        bottomColor: bottomColor || "",
+        darkVibrant: darkVibrant || "",
+        lightVibrant: lightVibrant || "",
+      });
+      isInitialLoad.current = false;
+    }
   }, [session]);
 
   useEffect(() => {
-    if (userConfig !== null) {
+    if (isConfigLoaded && userConfig !== null) {
       handleSync();
     }
-  }, [userConfig]);
+  }, [userConfig, isConfigLoaded]);
 
   const handleSync = () => {
-    console.log(userConfig);
     if (session && userConfig) {
       if (serverUserConfig) {
         if (
@@ -140,6 +155,43 @@ export function SyncModule({ session }: SyncModuleProps) {
       }
     }
   };
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      if (session) {
+        const autoThemeEnabled = localStorage.getItem("autoThemeEnabled");
+        const tabs = localStorage.getItem("tabs");
+        const themeImage = localStorage.getItem("themeImage");
+        const searchEngine = localStorage.getItem("searchEngine");
+        const topColor = localStorage.getItem("topColor");
+        const bottomColor = localStorage.getItem("bottomColor");
+        const darkVibrant = localStorage.getItem("darkVibrant");
+        const lightVibrant = localStorage.getItem("lightVibrant");
+
+        const newConfig: UserConfig = {
+          userId: session.user.id,
+          autoThemeEnabled: autoThemeEnabled
+            ? JSON.parse(autoThemeEnabled)
+            : null,
+          tabs: tabs || "",
+          themeImage: themeImage || "",
+          searchEngine: searchEngine || "",
+          topColor: topColor || "",
+          bottomColor: bottomColor || "",
+          darkVibrant: darkVibrant || "",
+          lightVibrant: lightVibrant || "",
+        };
+
+        setUserConfig(newConfig);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [session]);
 
   return (
     <div>
