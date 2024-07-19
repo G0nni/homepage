@@ -174,12 +174,26 @@ export function Tabs() {
     tabsRef.current.scrollLeft = scrollLeft - walk;
   };
 
-  const handleAddLink = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddLink = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const logoUrl = `https://logo.clearbit.com/${newLinkHref}`;
+    let logoExists = false;
+
+    try {
+      const response = await fetch(logoUrl);
+      if (response.ok) {
+        logoExists = true;
+      }
+    } catch (error) {
+      console.error("Error fetching logo", error);
+    }
 
     const newLink: Link = {
       href: newLinkHref,
-      logo: "https://logo.clearbit.com/" + newLinkHref,
+      logo: logoExists
+        ? logoUrl
+        : `https://www.google.com/s2/favicons?domain=${newLinkHref}`,
       alt: newLinkAlt,
     };
 
@@ -241,14 +255,22 @@ export function Tabs() {
     });
   };
 
-  const handleEditLink = (tabName: string, oldHref: string, newLink: Link) => {
+  const handleEditLink = (
+    tabName: string,
+    oldHref: string,
+    newLink: string,
+    newAlt: string,
+  ) => {
+    console.log("eeee", tabName, oldHref, newLink, newAlt);
     setTabs((prevTabs) => {
       const updatedTabs = prevTabs.map((tab) => {
         if (tab.name === tabName) {
           return {
             ...tab,
             links: tab.links.map((link) =>
-              link.href === oldHref ? newLink : link,
+              link.href === oldHref
+                ? { ...link, href: newLink, alt: newAlt }
+                : link,
             ),
           };
         }
@@ -389,7 +411,9 @@ export function Tabs() {
               key={linkIndex}
               href={link.href}
               className="col-span-1"
-              onContextMenu={(e) => handleContextMenu(e, "link", link.href)}
+              onContextMenu={(e) =>
+                handleContextMenu(e, "link", `${link.href},${link.alt}`)
+              }
             >
               <div
                 className="group relative transition-transform duration-100 ease-in hover:z-10 hover:scale-110 hover:bg-opacity-50"
@@ -444,20 +468,26 @@ export function Tabs() {
             type={contextMenu.type}
             target={contextMenu.target}
             onClose={handleContextMenuClose}
-            onEdit={(newName) => {
+            onEdit={(newHref, newAlt) => {
               if (contextMenu.type === "tab") {
-                handleEditTab(contextMenu.target!, newName);
+                handleEditTab(contextMenu.target!, newHref);
               } else if (contextMenu.type === "link") {
                 const activeTabObj = tabs.find((tab) => tab.name === activeTab);
                 if (activeTabObj) {
                   const linkToEdit = activeTabObj.links.find(
-                    (link) => link.href === contextMenu.target,
+                    (link) =>
+                      link.href ===
+                      (contextMenu.target
+                        ? contextMenu.target.split(",")[0]
+                        : ""),
                   );
                   if (linkToEdit) {
-                    handleEditLink(activeTabObj.name, linkToEdit.href, {
-                      ...linkToEdit,
-                      href: newName,
-                    });
+                    handleEditLink(
+                      activeTabObj.name,
+                      linkToEdit.href,
+                      newHref,
+                      newAlt,
+                    );
                   }
                 }
               }

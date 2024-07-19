@@ -6,7 +6,7 @@ interface ContextMenuProps {
   type: "tab" | "link" | null;
   target: string | null;
   onClose: () => void;
-  onEdit: (newName: string) => void;
+  onEdit: (newName: string, newAlt: string) => void;
   onDelete: () => void;
 }
 
@@ -19,12 +19,17 @@ export function ContextMenu({
   onEdit,
   onDelete,
 }: ContextMenuProps) {
+  // séparer target en récupérant les valeurs séparées par une virgule
+  const entryName = target?.split(",")[0];
+  const entryAlt = target?.split(",")[1];
+
   const [editMode, setEditMode] = useState(false);
-  const [newName, setNewName] = useState(target ?? "");
+  const [newName, setNewName] = useState(entryName ?? "");
+  const [newAlt, setNewAlt] = useState(entryAlt ?? "");
   const typeInFrench = type === "tab" ? "onglet" : "lien";
 
   const handleEdit = () => {
-    onEdit(newName);
+    onEdit(newName, newAlt);
     setEditMode(false);
     onClose();
   };
@@ -63,6 +68,16 @@ export function ContextMenu({
             onChange={(e) => setNewName(e.target.value)}
             className="mb-2 rounded-md border px-2 py-1 text-gray-700"
           />
+          {type === "link" && (
+            <input
+              type="text"
+              value={newAlt}
+              onChange={(e) => setNewAlt(e.target.value)}
+              className="mb-2 rounded-md border px-2 py-1 text-gray-700"
+              placeholder="Texte alternatif"
+            />
+          )}
+
           <button
             className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
             onClick={handleEdit}
