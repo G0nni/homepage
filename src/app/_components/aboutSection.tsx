@@ -17,9 +17,34 @@ const AboutSection: React.FC = () => {
       </p>
       <ul className="list-disc pl-5">
         <li>Recherche rapide et efficace</li>
+        <li>Permet de choisir son moteur de recherche</li>
         <li>Organisation des favoris par dossier</li>
         <li>Personnalisation du thème</li>
+        <li>Synchronisation des paramètres entre différents appareils</li>
+        <li>
+          Permet d'afficher un message personnalisé pour vous ou pour tous
+        </li>
       </ul>
+      <h3 className="mt-8 text-lg font-semibold">
+        Ce qui se trame pour la suite
+      </h3>
+      <p>Hey! Voici quelques idées sur lesquelles je travaille :</p>
+      <ul className="list-disc pl-5">
+        <li>
+          Peut-être qu'on va rajouter des chats ? Tout le monde aime les chats.
+        </li>
+        <li>
+          Des thèmes encore plus personnalisables, parce que pourquoi pas ?
+        </li>
+        <li>
+          Et si on faisait en sorte que l'appli vous serve un café ? (Je
+          travaille encore sur la partie technique...)
+        </li>
+      </ul>
+      <p>
+        Je taffe sur l'app quand je peux/veux donc pas de pression. Restez à
+        l'écoute !
+      </p>
     </div>
   );
 };

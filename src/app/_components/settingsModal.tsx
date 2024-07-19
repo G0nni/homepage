@@ -194,7 +194,11 @@ export function SettingsModal({ session }: SettingsModalProps) {
           </div>
         );
       case "about":
-        return <AboutSection />;
+        return (
+          <div className="max-h-full overflow-y-auto">
+            <AboutSection />
+          </div>
+        );
       case "reset":
         return (
           <div>

@@ -75,6 +75,8 @@ export function Post({ session }: SettingsModalProps) {
   });
 
   const handlePost = () => {
+    console.log("name", name);
+    console.log("publicPost", publicPost);
     if (!name.trim()) {
       // Vous pouvez ajouter une logique ici pour afficher un message d'erreur si nécessaire
       setLogMessage("Votre phrase ne peut pas être vide.");
@@ -126,7 +128,7 @@ export function Post({ session }: SettingsModalProps) {
             id="postTitle"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Your title here"
+            placeholder="Votre phrase"
             className="mt-1 block w-full rounded-md border-gray-300 text-gray-800 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             required
           />
@@ -164,7 +166,7 @@ export function Post({ session }: SettingsModalProps) {
             disabled={
               createPost.isPending ||
               updatePost.isPending ||
-              !!(post && name === post.name)
+              !!(post && name === post.name && publicPost === post.public)
             }
           >
             {post ? "Mettre à jour" : "Ajouter"}

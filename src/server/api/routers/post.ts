@@ -44,7 +44,7 @@ export const postRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       return ctx.db.post.update({
         where: { id: input.id },
-        data: { name: input.name },
+        data: { name: input.name, public: input.public },
       });
     }),
 
