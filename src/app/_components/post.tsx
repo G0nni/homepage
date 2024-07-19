@@ -15,28 +15,40 @@ interface SettingsModalProps {
   session: Session | null;
 }
 
+type userPost = {
+  id: number;
+  name: string;
+  public: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  createdById: string;
+};
+
 export function Post({ session }: SettingsModalProps) {
-  const [post, setPost] = useState<{
-    id: number;
-    name: string;
-    createdAt: Date;
-    updatedAt: Date;
-    createdById: string;
-  } | null>(null);
+  const [post, setPost] = useState<userPost | null>(null);
   const utils = api.useUtils();
   const [name, setName] = useState("");
+  const [publicPost, setPublicPost] = useState(false);
   const [logMessage, setLogMessage] = useState<string | null>(null);
 
   // Assuming `useQuery` is the correct hook for non-Suspense fetching
   const { data: latestPost, error } = api.post.getLatest.useQuery(undefined, {
     enabled: !!session, // Only run the query if the session exists
     retry: false,
-  });
+  }) as { data: userPost | null; error: unknown };
 
   useEffect(() => {
     if (latestPost) {
-      setPost(latestPost);
+      setPost({
+        id: latestPost.id,
+        name: latestPost.name,
+        public: latestPost.public,
+        createdAt: latestPost.createdAt,
+        updatedAt: latestPost.updatedAt,
+        createdById: latestPost.createdById,
+      });
       setName(latestPost.name);
+      setPublicPost(latestPost.public);
     }
   }, [latestPost]);
 
@@ -69,7 +81,8 @@ export function Post({ session }: SettingsModalProps) {
       return; // Sortie anticipée de la fonction si name est vide
     }
     if (post) {
-      updatePost.mutate({ id: post.id, name });
+      console.log("publicPost", publicPost);
+      updatePost.mutate({ id: post.id, name, public: publicPost });
       setLogMessage(null);
     } else {
       createPost.mutate({ name });
@@ -117,6 +130,19 @@ export function Post({ session }: SettingsModalProps) {
             className="mt-1 block w-full rounded-md border-gray-300 text-gray-800 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             required
           />
+
+          <div className="mt-4 flex items-center space-x-2">
+            <input
+              id="publicPost"
+              type="checkbox"
+              checked={publicPost}
+              onChange={() => setPublicPost(!publicPost)}
+              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            />
+            <label htmlFor="publicPost" className="text-sm text-gray-700">
+              Rendre public - visible par tous, accès aux phrases des autres
+            </label>
+          </div>
         </div>
         <div className="mt-4 flex justify-end space-x-2">
           {logMessage && (

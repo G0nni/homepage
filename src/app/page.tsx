@@ -16,11 +16,29 @@ type Session = {
   };
   [key: string]: unknown;
 };
+
+type userPost = {
+  id: number;
+  name: string;
+  public: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  createdById: string;
+};
+
 export default async function Home() {
   const session: Session | null =
     (await getServerAuthSession()) as Session | null;
 
   const randomPost = await api.post.getRandom();
+  const userPost: userPost =
+    (await api.post.getLatest()) as unknown as userPost;
+
+  if (userPost) {
+    console.log("User post:", userPost);
+  } else {
+    console.log("No user post found");
+  }
 
   return (
     <HydrateClient>
@@ -48,8 +66,14 @@ export default async function Home() {
           <ImageContainer />
           <div className="flex w-25rem flex-col gap-2 md:w-30rem lg:w-30rem">
             <div className="flex flex-col items-center gap-10 pt-44 md:pt-5 lg:pt-5">
-              {randomPost ? (
-                <p className="text-sm">{randomPost.name}</p>
+              {userPost ? (
+                !userPost.public ? (
+                  <p className="text-sm">{userPost.name}</p>
+                ) : randomPost ? (
+                  <p className="text-sm">{randomPost.name}</p>
+                ) : (
+                  <p className="text-sm">Bienvenue !</p>
+                )
               ) : (
                 <p className="text-sm">Bienvenue !</p>
               )}
