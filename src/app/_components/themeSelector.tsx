@@ -12,8 +12,8 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({
   handleAutoThemeChange,
   isAutoThemeEnabled,
 }) => {
-  const [topColor, setTopColor] = useColor("#035d80");
-  const [bottomColor, setBottomColor] = useColor("#aab9af");
+  const [topColor, setTopColor] = useColor("#65bad7");
+  const [bottomColor, setBottomColor] = useColor("#7a7e46");
 
   const isValidColor = (color: unknown): color is IColor => {
     if (typeof color !== "object" || color === null) return false;

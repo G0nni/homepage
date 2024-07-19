@@ -51,8 +51,8 @@ function isValidColorData(obj: unknown): obj is ColorData {
 
 // Composant BackgroundGradient
 export function BackgroundGradient() {
-  const [topColor, setTopColor] = useState<string>("#035d80");
-  const [bottomColor, setBottomColor] = useState<string>("#aab9af");
+  const [topColor, setTopColor] = useState<string>("#65bad7");
+  const [bottomColor, setBottomColor] = useState<string>("#7a7e46");
 
   useEffect(() => {
     const initialStorageCheck = () => {

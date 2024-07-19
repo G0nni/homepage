@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import defaultImage from "~/images/default.jpg";
 
 import Vibrant from "node-vibrant";
 import ImageUploader from "./imageUploader";
@@ -36,9 +37,11 @@ export function SettingsModal({ session }: SettingsModalProps) {
   });
 
   useEffect(() => {
-    const storedImage = localStorage.getItem("themeImage");
+    const storedImage = localStorage.getItem("themeImage") ?? defaultImage.src;
     if (storedImage) {
       setImagePreviewUrl(storedImage);
+    } else {
+      setImagePreviewUrl(defaultImage.src);
     }
     // Read the autoThemeEnabled value from localStorage and initialize isAutoThemeEnabled state
     const storedAutoTheme = localStorage.getItem("autoThemeEnabled");
@@ -205,7 +208,6 @@ export function SettingsModal({ session }: SettingsModalProps) {
                 ) {
                   localStorage.clear();
                   window.dispatchEvent(new Event("storage"));
-                  window.location.reload();
                 }
               }}
               className="mt-4 rounded-md bg-red-500 px-4 py-2 text-white"

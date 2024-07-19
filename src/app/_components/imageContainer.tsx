@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import defaultImage from "~/images/default.webp";
+import defaultImage from "~/images/default.jpg";
 
 export function ImageContainer() {
   const [image, setImage] = useState<string | undefined>();
@@ -21,6 +21,13 @@ export function ImageContainer() {
     const handleStorageChange = () => {
       const newImage = localStorage.getItem("themeImage") ?? defaultImage.src;
       setImage(newImage);
+      if (
+        localStorage.getItem("themeImage") === null ||
+        localStorage.getItem("themeImage") === undefined ||
+        localStorage.getItem("themeImage") === ""
+      ) {
+        setImage(defaultImage.src);
+      }
     };
 
     // Ajouter un écouteur pour le changement d'événement de stockage
