@@ -21,6 +21,7 @@ export function ContextMenu({
 }: ContextMenuProps) {
   const [editMode, setEditMode] = useState(false);
   const [newName, setNewName] = useState(target ?? "");
+  const typeInFrench = type === "tab" ? "onglet" : "lien";
 
   const handleEdit = () => {
     onEdit(newName);
@@ -45,13 +46,13 @@ export function ContextMenu({
             className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
             onClick={() => setEditMode(true)}
           >
-            Edit {type}
+            Editer {typeInFrench}
           </button>
           <button
             className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
             onClick={handleDelete}
           >
-            Delete {type}
+            Supprimer {typeInFrench}
           </button>
         </>
       ) : (
@@ -66,7 +67,7 @@ export function ContextMenu({
             className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
             onClick={handleEdit}
           >
-            Save
+            Sauvegarder
           </button>
         </div>
       )}
