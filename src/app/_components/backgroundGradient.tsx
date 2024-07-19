@@ -174,7 +174,7 @@ export function BackgroundGradient() {
     return () => {
       window.removeEventListener("storage", handleStorageChange);
     };
-  }, []); // Assurez-vous de spécifier les bonnes dépendances si nécessaire
+  }, []);
 
   return <></>;
 }

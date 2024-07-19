@@ -32,10 +32,10 @@ export function Post({ session }: SettingsModalProps) {
   const [logMessage, setLogMessage] = useState<string | null>(null);
 
   // Assuming `useQuery` is the correct hook for non-Suspense fetching
-  const { data: latestPost, error } = api.post.getLatest.useQuery(undefined, {
+  const { data: latestPost } = api.post.getLatest.useQuery(undefined, {
     enabled: !!session, // Only run the query if the session exists
     retry: false,
-  }) as { data: userPost | null; error: unknown };
+  }) as { data: userPost | null };
 
   useEffect(() => {
     if (latestPost) {

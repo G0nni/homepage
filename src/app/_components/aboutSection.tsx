@@ -22,7 +22,7 @@ const AboutSection: React.FC = () => {
         <li>Personnalisation du thème</li>
         <li>Synchronisation des paramètres entre différents appareils</li>
         <li>
-          Permet d'afficher un message personnalisé pour vous ou pour tous
+          Permet d&apos;afficher un message personnalisé pour vous ou pour tous
         </li>
       </ul>
       <h3 className="mt-8 text-lg font-semibold">
@@ -31,19 +31,20 @@ const AboutSection: React.FC = () => {
       <p>Hey! Voici quelques idées sur lesquelles je travaille :</p>
       <ul className="list-disc pl-5">
         <li>
-          Peut-être qu'on va rajouter des chats ? Tout le monde aime les chats.
+          Peut-être qu&apos;on va rajouter des chats ? Tout le monde aime les
+          chats.
         </li>
         <li>
           Des thèmes encore plus personnalisables, parce que pourquoi pas ?
         </li>
         <li>
-          Et si on faisait en sorte que l'appli vous serve un café ? (Je
+          Et si on faisait en sorte que l&apos;appli vous serve un café ? (Je
           travaille encore sur la partie technique...)
         </li>
       </ul>
       <p>
-        Je taffe sur l'app quand je peux/veux donc pas de pression. Restez à
-        l'écoute !
+        Je taffe sur l&apos;app quand je peux/veux donc pas de pression. Restez
+        à l&apos;écoute !
       </p>
     </div>
   );

@@ -66,10 +66,10 @@ export default async function Home() {
                 ) : randomPost ? (
                   <p className="text-sm">{randomPost.name}</p>
                 ) : (
-                  <p className="text-sm">Bienvenue !</p>
+                  <p className="text-sm">Bienvenue sur ma homepage !</p>
                 )
               ) : (
-                <p className="text-sm">Bienvenue !</p>
+                <p className="text-sm">Bienvenue sur ma homepage !</p>
               )}
               <RealTimeHour />
               <SearchBar />
