@@ -63,9 +63,12 @@ export const postRouter = createTRPCRouter({
   }),
 
   getRandom: publicProcedure.query(async ({ ctx }) => {
-    const count = await ctx.db.post.count();
+    const count = await ctx.db.post.count({
+      where: { public: true },
+    });
     const randomRowNumber = Math.floor(Math.random() * count);
     return ctx.db.post.findFirst({
+      where: { public: true },
       skip: randomRowNumber,
     });
   }),

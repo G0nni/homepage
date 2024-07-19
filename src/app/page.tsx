@@ -34,12 +34,6 @@ export default async function Home() {
   const userPost: userPost =
     (await api.post.getLatest()) as unknown as userPost;
 
-  if (userPost) {
-    console.log("User post:", userPost);
-  } else {
-    console.log("No user post found");
-  }
-
   return (
     <HydrateClient>
       <BackgroundGradient />
