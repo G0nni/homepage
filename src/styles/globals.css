@@ -6,7 +6,7 @@
   font-family: "MonaspaceNeon-Regular";
   src:
     local("MonaspaceNeon-Regular"),
-    url("../Fonts/MonaspaceNeon-Regular.otf") format("otf");
+    url("../fonts/MonaspaceNeon-Regular.otf") format("otf");
 }
 
 .custom-scrollbar {
