@@ -31,8 +31,10 @@ export default async function Home() {
     (await getServerAuthSession()) as Session | null;
 
   const randomPost = await api.post.getRandom();
-  const userPost: userPost =
-    (await api.post.getLatest()) as unknown as userPost;
+  let userPost: userPost | null = null;
+  if (session) {
+    userPost = (await api.post.getLatest()) as unknown as userPost;
+  }
 
   return (
     <HydrateClient>
