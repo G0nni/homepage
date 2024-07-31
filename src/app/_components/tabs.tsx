@@ -282,16 +282,20 @@ export function Tabs() {
   };
 
   const handleDeleteLink = (tabName: string, href: string) => {
+    console.log("eeee", tabName, href);
     setTabs((prevTabs) => {
       const updatedTabs = prevTabs.map((tab) => {
         if (tab.name === tabName) {
+          console.log("tab.links", tab.links);
+          console.log("href", href.split(",")[0]);
           return {
             ...tab,
-            links: tab.links.filter((link) => link.href !== href),
+            links: tab.links.filter((link) => link.href !== href.split(",")[0]),
           };
         }
         return tab;
       });
+      console.log("updatedTabs", updatedTabs);
       localStorage.setItem("tabs", JSON.stringify(updatedTabs));
       return updatedTabs;
     });
