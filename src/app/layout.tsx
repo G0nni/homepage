@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "~/trpc/react";
+import { SessionWrapper } from "./_components/SessionWrapper";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -17,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${GeistSans.variable}`}>
       <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <SessionWrapper>{children}</SessionWrapper>
+        </TRPCReactProvider>
       </body>
     </html>
   );

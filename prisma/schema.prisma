@@ -38,6 +38,7 @@ model UserConfig {
     bottomColor      String?  // Optionnel, stocke des données JSON sous forme de chaîne
     darkVibrant      String?  // Optionnel, stocke des données JSON sous forme de chaîne
     lightVibrant     String?  // Optionnel, stocke des données JSON sous forme de chaîne
+    layout           String?  // JSON du dashboard (widgets, positions, etc.)
 
     user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

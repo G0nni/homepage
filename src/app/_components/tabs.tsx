@@ -29,7 +29,15 @@ interface ContextMenuState {
   type: "tab" | "link" | null;
 }
 
-export function Tabs() {
+interface TabsProps {
+  activeTab?: string;
+  setActiveTab?: (tab: string) => void;
+}
+
+export function Tabs({
+  activeTab: activeTabProp,
+  setActiveTab: setActiveTabProp,
+}: TabsProps = {}) {
   const [tabs, setTabs] = useState<Tab[]>([
     {
       name: "Home",
@@ -111,7 +119,13 @@ export function Tabs() {
     }, 300);
   }, []);
 
-  const [activeTab, setActiveTab] = useState<string>(tabs[0]?.name ?? "Home");
+  const [internalActiveTab, internalSetActiveTab] = useState<string>(
+    tabs[0]?.name ?? "Home",
+  );
+  const activeTab =
+    activeTabProp !== undefined ? activeTabProp : internalActiveTab;
+  const setActiveTab =
+    setActiveTabProp !== undefined ? setActiveTabProp : internalSetActiveTab;
   const [isSliderMode, setIsSliderMode] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);

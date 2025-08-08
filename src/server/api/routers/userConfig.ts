@@ -59,4 +59,25 @@ export const userConfigRouter = createTRPCRouter({
       });
       return deletedUserConfig;
     }),
+
+  // Récupérer le layout du dashboard
+  getLayout: protectedProcedure.query(async ({ ctx }) => {
+    const config = await ctx.db.userConfig.findUnique({
+      where: { userId: ctx.session.user.id },
+      select: { layout: true },
+    });
+    return { layout: config?.layout };
+  }),
+
+  // Mettre à jour le layout du dashboard
+  setLayout: protectedProcedure
+    .input(z.object({ layout: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.userConfig.upsert({
+        where: { userId: ctx.session.user.id },
+        update: { layout: input.layout },
+        create: { userId: ctx.session.user.id, layout: input.layout },
+      });
+      return { success: true };
+    }),
 });
