@@ -44,27 +44,23 @@
   --text:#e0def4; --subtext:#908caa; --muted:#6e6a86;
   --theme-accent:#c4a7e7; --accent2:#9ccfd8; --green:#31748f; --red:#eb6f92;
 }
-/* --accent suit le theme, sauf si une image impose sa couleur dominante
-   (le JS ecrit alors --accent en inline sur :root) */
+/* --accent suit le theme, sauf si une image impose sa couleur dominante */
 :root{ --accent:var(--theme-accent) }
 
 *{box-sizing:border-box;margin:0;padding:0}
 html{height:100%}
 body{
   position:relative; min-height:100%;
-  background:var(--base);
-  color:var(--text);
+  background:var(--base); color:var(--text);
   font-family:"JetBrains Mono",ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SF Mono",Menlo,monospace;
   font-size:15px; line-height:1.5;
   -webkit-font-smoothing:antialiased;
-  display:flex; flex-direction:column;
-  overflow-x:hidden;
+  display:flex; flex-direction:column; overflow-x:hidden;
 }
 
 /* ── fond ─────────────────────────────────────────────────────────── */
 .bg{position:fixed;inset:0;z-index:0;background-position:center;background-size:cover;background-repeat:no-repeat}
 .bg::after{content:"";position:absolute;inset:0;background:var(--base);opacity:var(--dim,.78);transition:opacity .2s}
-/* halo d'accent, uniquement quand il n'y a pas d'image */
 body::before{
   content:""; position:fixed; inset:-30%; z-index:0; pointer-events:none;
   background:
@@ -82,13 +78,11 @@ button,input,textarea,select{font:inherit;color:inherit}
 /* ── layout ───────────────────────────────────────────────────────── */
 .wrap{
   position:relative; z-index:1;
-  flex:1; width:100%; max-width:720px; margin:0 auto;
+  flex:1; width:100%; max-width:620px; margin:0 auto;
   padding:clamp(28px,7vh,72px) 22px 90px;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:30px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:30px;
 }
 
-/* horloge */
 .clock{text-align:center}
 .greet{color:var(--subtext);font-size:.9rem;letter-spacing:.14em;text-transform:uppercase}
 .greet b{color:var(--accent);font-weight:500}
@@ -102,20 +96,19 @@ button,input,textarea,select{font:inherit;color:inherit}
 .time .sec{font-size:.3em;color:var(--muted);margin-left:.35em;align-self:flex-start;padding-top:.55em}
 .date{color:var(--muted);font-size:.85rem;letter-spacing:.05em}
 
-/* recherche */
-.search{width:100%}
-.search form{
+/* ── barre + resultats ────────────────────────────────────────────── */
+.omni{width:100%;display:flex;flex-direction:column;gap:8px}
+.omni form{
   display:flex; align-items:center; gap:12px;
   background:color-mix(in srgb,var(--mantle) 78%,transparent);
   border:1px solid var(--line); border-radius:12px;
-  padding:0 16px; height:52px;
-  backdrop-filter:blur(14px);
+  padding:0 16px; height:52px; backdrop-filter:blur(14px);
   transition:border-color .18s, box-shadow .18s;
 }
-.search form:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
-.search .prompt{color:var(--accent);font-weight:500;user-select:none}
-.search input{flex:1;background:none;border:0;outline:none;min-width:0}
-.search input::placeholder{color:var(--muted)}
+.omni form:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+.omni .prompt{color:var(--accent);font-weight:500;user-select:none}
+.omni input{flex:1;background:none;border:0;outline:none;min-width:0}
+.omni input::placeholder{color:var(--muted)}
 .chip{
   font-size:.72rem;padding:3px 9px;border-radius:999px;white-space:nowrap;
   background:color-mix(in srgb,var(--accent) 18%,transparent);
@@ -123,50 +116,37 @@ button,input,textarea,select{font:inherit;color:inherit}
 }
 .chip.engine{background:none;color:var(--muted);border-color:var(--line)}
 
-/* onglets */
-.tabsRow{width:100%;display:flex;flex-direction:column;gap:10px}
-.tabs{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
-.tab{
-  cursor:pointer;background:none;border:1px solid transparent;border-radius:8px;
-  padding:5px 12px;font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--muted);transition:color .15s,border-color .15s,background .15s;
-  display:flex;align-items:center;gap:7px;
-}
-.tab:hover{color:var(--subtext)}
-.tab[aria-selected=true]{color:var(--accent);border-color:var(--line);background:color-mix(in srgb,var(--mantle) 70%,transparent)}
-.tab .num{font-size:.66rem;color:var(--muted);opacity:.7}
-.tab[aria-selected=true] .num{color:var(--accent)}
-
-/* liens de l'onglet actif */
-.links{
+.results{
   background:color-mix(in srgb,var(--mantle) 62%,transparent);
-  border:1px solid var(--line); border-radius:14px;
-  padding:14px; backdrop-filter:blur(14px);
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:2px 10px;
-  animation:fade .18s ease-out;
+  border:1px solid var(--line); border-radius:12px;
+  padding:6px; backdrop-filter:blur(14px);
+  display:flex; flex-direction:column; gap:1px;
+  animation:fade .16s ease-out;
 }
-@keyframes fade{from{opacity:0;transform:translateY(4px)}}
-.links a{
-  display:flex;align-items:center;gap:10px;
-  padding:6px 9px;border-radius:8px;
-  color:var(--subtext);font-size:.88rem;
-  transition:background .14s,color .14s;
+.results:empty{display:none}
+@keyframes fade{from{opacity:0;transform:translateY(-4px)}}
+.res{
+  display:flex; align-items:center; gap:11px;
+  padding:7px 10px; border-radius:8px;
+  color:var(--subtext); font-size:.88rem; cursor:pointer;
+  transition:background .12s,color .12s;
 }
-.links a:hover,.links a.hot{background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--text)}
-.links a .key{
+.res:hover{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.res[aria-selected=true]{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--text)}
+.res .key{
   font-size:.68rem;color:var(--muted);
   border:1px solid var(--line);border-radius:5px;
-  padding:0 5px;min-width:24px;text-align:center;
-  transition:color .14s,border-color .14s;
+  padding:0 5px;min-width:24px;text-align:center;flex:none;
 }
-.links a:hover .key,.links a.hot .key{color:var(--accent);border-color:var(--accent)}
-.links a .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.res[aria-selected=true] .key,.res:hover .key{color:var(--accent);border-color:var(--accent)}
+.res .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.res .cat{font-size:.7rem;color:var(--muted);flex:none}
+.res.web .key{border-style:dashed}
+.res.web .name{color:var(--muted)}
+.res.web b{color:var(--text);font-weight:400}
 
-/* fetch (facon neofetch) */
-.fetch{
-  position:absolute;left:26px;bottom:22px;z-index:1;
-  font-size:.74rem;color:var(--muted);line-height:1.65;
-}
+/* ── fetch ────────────────────────────────────────────────────────── */
+.fetch{position:absolute;left:26px;bottom:22px;z-index:1;font-size:.74rem;color:var(--muted);line-height:1.65}
 .fetch .who{color:var(--accent);font-weight:500}
 .fetch .who span{color:var(--muted);font-weight:400}
 .fetch .rule{color:var(--line)}
@@ -174,17 +154,15 @@ button,input,textarea,select{font:inherit;color:inherit}
 .fetch dt{color:var(--accent2)}
 .fetch dd{color:var(--subtext)}
 
-/* barre d'aide */
 .hints{
   position:absolute;right:26px;bottom:22px;z-index:1;
   display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end;
   font-size:.74rem;color:var(--muted);
 }
 .hints kbd{border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--subtext);font-size:.7rem}
-.matches{color:var(--accent);display:flex;gap:10px}
-.matches b{font-weight:400;color:var(--subtext)}
+.buffer{color:var(--accent);letter-spacing:.2em;min-width:2ch}
 
-/* panneau reglages */
+/* ── panneau ──────────────────────────────────────────────────────── */
 .overlay{
   position:fixed;inset:0;z-index:10;display:none;
   background:color-mix(in srgb,var(--base) 72%,transparent);
@@ -212,18 +190,12 @@ button,input,textarea,select{font:inherit;color:inherit}
 .check{display:flex;align-items:center;gap:9px;font-size:.82rem;color:var(--subtext);cursor:pointer}
 .check input{accent-color:var(--accent);width:16px;height:16px}
 .swatches{display:flex;flex-wrap:wrap;gap:8px}
-.sw{
-  cursor:pointer;border:1px solid var(--line);border-radius:9px;padding:7px 11px;
-  font-size:.78rem;background:none;color:var(--subtext);display:flex;align-items:center;gap:8px;
-}
+.sw{cursor:pointer;border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:.78rem;background:none;color:var(--subtext);display:flex;align-items:center;gap:8px}
 .sw:hover{border-color:var(--accent2)}
 .sw[aria-pressed=true]{border-color:var(--accent);color:var(--text)}
 .sw i{width:11px;height:11px;border-radius:50%;display:block}
 .row{display:flex;gap:9px;flex-wrap:wrap}
-.btn{
-  cursor:pointer;background:none;border:1px solid var(--line);border-radius:9px;
-  padding:9px 15px;font-size:.82rem;color:var(--subtext);transition:border-color .15s,color .15s;
-}
+.btn{cursor:pointer;background:none;border:1px solid var(--line);border-radius:9px;padding:9px 15px;font-size:.82rem;color:var(--subtext);transition:border-color .15s,color .15s}
 .btn:hover{border-color:var(--accent);color:var(--text)}
 .btn.primary{border-color:var(--accent);color:var(--accent)}
 .btn.danger:hover{border-color:var(--red);color:var(--red)}
@@ -240,8 +212,7 @@ button,input,textarea,select{font:inherit;color:inherit}
   .wrap{padding-top:34px;gap:24px}
 }
 @media (prefers-reduced-motion:reduce){
-  body::before{animation:none} .time .sep{animation:none}
-  .panel,.links{animation:none}
+  body::before{animation:none} .time .sep{animation:none} .panel,.results{animation:none}
 }
 </style>
 </head>
@@ -258,26 +229,24 @@ button,input,textarea,select{font:inherit;color:inherit}
     <p class="date" id="date"></p>
   </section>
 
-  <section class="search">
+  <section class="omni">
     <form id="searchForm" autocomplete="off">
       <span class="prompt">&gt;</span>
-      <input id="q" type="text" placeholder="rechercher...  (appuie sur / )" aria-label="Recherche">
+      <input id="q" type="text" placeholder="filtrer ou rechercher...  ( / )"
+             aria-label="Filtrer les liens ou rechercher sur le web"
+             role="combobox" aria-expanded="true" aria-controls="results">
       <span class="chip engine" id="engineChip"></span>
     </form>
-  </section>
-
-  <section class="tabsRow">
-    <nav class="tabs" id="tabs" role="tablist" aria-label="Categories"></nav>
-    <div class="links" id="links" role="tabpanel"></div>
+    <div class="results" id="results" role="listbox" aria-label="Resultats"></div>
   </section>
 </main>
 
 <aside class="fetch" id="fetch"></aside>
 
 <div class="hints">
-  <span class="matches" id="matches"></span>
-  <span><kbd>/</kbd> rechercher</span>
-  <span><kbd>&larr;</kbd><kbd>&rarr;</kbd> onglets</span>
+  <span class="buffer" id="buffer"></span>
+  <span><kbd>/</kbd> filtrer</span>
+  <span><kbd>2 lettres</kbd> ouvrir</span>
   <span><kbd>?</kbd> reglages</span>
 </div>
 
@@ -350,10 +319,11 @@ button,input,textarea,select{font:inherit;color:inherit}
       <label for="fCats">Liens (JSON)</label>
       <textarea id="fCats" spellcheck="false"></textarea>
       <p class="help">
-        Format : <code>[{ "name":"dev", "links":[{ "name":"GitHub", "url":"...", "key":"gh" }] }]</code><br>
-        Chaque entree du tableau devient un onglet. <code>key</code> = les 2 lettres
-        a taper pour ouvrir le lien, depuis n'importe quel onglet. Laisse vide pour
-        generer automatiquement.
+        Format : <code>[{ "name":"dev", "links":[{ "name":"GitHub", "url":"...", "key":"gh", "pin":true }] }]</code><br>
+        <code>pin</code> : le lien s'affiche sous la barre au repos (6 max).
+        Tous les autres restent trouvables en tapant.<br>
+        <code>key</code> : les 2 lettres a taper pour l'ouvrir directement.
+        Laisse vide pour generer automatiquement.
       </p>
       <p class="msg" id="msg"></p>
     </div>
@@ -373,6 +343,7 @@ button,input,textarea,select{font:inherit;color:inherit}
   "use strict";
 
   const KEY = "startpage.config.v3";
+  const MAX_RESULTS = 6;
 
   const THEMES = [
     ["mocha",      "catppuccin mocha", "#cba6f7"],
@@ -413,14 +384,14 @@ button,input,textarea,select{font:inherit;color:inherit}
     bg: { src: "", dim: 78, auto: true, accent: "" },
     cats: [
       { name: "perso", links: [
-        { name: "GitHub",          url: "https://github.com/G0nni",     key: "gh" },
+        { name: "GitHub",          url: "https://github.com/G0nni",     key: "gh", pin: true },
         { name: "Portfolio",       url: "https://nicolas-cros.fr",      key: "pf" },
         { name: "Blog",            url: "https://anindividual.me",      key: "bl" },
         { name: "Soso Dedeck",     url: "https://soso-dedeck.fr",       key: "sd" },
         { name: "ArtistDiscovery", url: "https://artist-discovery.com", key: "ad" },
       ]},
       { name: "dev", links: [
-        { name: "Claude",   url: "https://claude.ai",                 key: "cl" },
+        { name: "Claude",   url: "https://claude.ai",                 key: "cl", pin: true },
         { name: "ChatGPT",  url: "https://chatgpt.com",               key: "cg" },
         { name: "v0",       url: "https://v0.dev",                    key: "vd" },
         { name: "Next.js",  url: "https://nextjs.org/docs",           key: "nx" },
@@ -435,13 +406,13 @@ button,input,textarea,select{font:inherit;color:inherit}
         { name: "Carbon",     url: "https://carbon.now.sh",             key: "cb" },
       ]},
       { name: "media", links: [
-        { name: "Stremio",       url: "https://web.stremio.com",   key: "st" },
-        { name: "YouTube",       url: "https://www.youtube.com",   key: "yt" },
+        { name: "Stremio",       url: "https://web.stremio.com",   key: "st", pin: true },
+        { name: "YouTube",       url: "https://www.youtube.com",   key: "yt", pin: true },
         { name: "YouTube Music", url: "https://music.youtube.com", key: "ym" },
-        { name: "Twitch",        url: "https://www.twitch.tv",     key: "tw" },
+        { name: "Twitch",        url: "https://www.twitch.tv",     key: "tw", pin: true },
       ]},
       { name: "veille", links: [
-        { name: "Hacker News",        url: "https://news.ycombinator.com",    key: "hn" },
+        { name: "Hacker News",        url: "https://news.ycombinator.com",    key: "hn", pin: true },
         { name: "Lobsters",           url: "https://lobste.rs",               key: "lo" },
         { name: "Journal du Hacker",  url: "https://www.journalduhacker.net", key: "jh" },
         { name: "LinuxFr",            url: "https://linuxfr.org",             key: "lf" },
@@ -459,8 +430,9 @@ button,input,textarea,select{font:inherit;color:inherit}
   // ── etat ────────────────────────────────────────────────────────────
   const clone = o => JSON.parse(JSON.stringify(o));
   let cfg = load();
-  let active = 0;          // index de l'onglet courant
-  let index = [];          // liens aplatis : {key, url, name, tab}
+  let index = [];    // liens aplatis : {key, url, name, pin, cat}
+  let items = [];    // ce qui est affiche sous la barre
+  let sel = -1;      // -1 = rien de selectionne
 
   function load() {
     try {
@@ -503,7 +475,9 @@ button,input,textarea,select{font:inherit;color:inherit}
             let key = (typeof l.key === "string" ? l.key : "").toLowerCase().replace(/[^a-z]/g, "").slice(0, 2);
             if (key.length < 2 || taken.has(key)) key = autoKey(l.name, taken);
             taken.add(key);
-            return { name: l.name, url: l.url.trim(), key };
+            const out = { name: l.name, url: l.url.trim(), key };
+            if (l.pin === true) out.pin = true;
+            return out;
           }),
       }))
       .filter(c => c.links.length);
@@ -521,12 +495,8 @@ button,input,textarea,select{font:inherit;color:inherit}
 
   function save() {
     cfg.cats = normalizeCats(cfg.cats);
-    try {
-      localStorage.setItem(KEY, JSON.stringify(cfg));
-      return true;
-    } catch (err) {
-      return err && err.name === "QuotaExceededError" ? "quota" : false;
-    }
+    try { localStorage.setItem(KEY, JSON.stringify(cfg)); return true; }
+    catch (err) { return err && err.name === "QuotaExceededError" ? "quota" : false; }
   }
 
   const $ = id => document.getElementById(id);
@@ -556,8 +526,6 @@ button,input,textarea,select{font:inherit;color:inherit}
     return "#" + f(0) + f(8) + f(4);
   }
 
-  // Echantillonne l'image et retient la teinte la plus vive, puis la ramene
-  // dans une plage lisible sur le fond du theme.
   function extractAccent(img) {
     const S = 64;
     const c = document.createElement("canvas");
@@ -565,26 +533,20 @@ button,input,textarea,select{font:inherit;color:inherit}
     const ctx = c.getContext("2d", { willReadFrequently: true });
     ctx.drawImage(img, 0, 0, S, S);
     let data;
-    try {
-      data = ctx.getImageData(0, 0, S, S).data;   // leve si l'image taint le canvas
-    } catch {
-      return null;
-    }
+    try { data = ctx.getImageData(0, 0, S, S).data; }
+    catch { return null; }          // canvas taint par une image sans CORS
     let best = null, bestScore = -1;
     for (let i = 0; i < data.length; i += 4) {
       if (data[i + 3] < 128) continue;
       const [h, s, l] = rgbToHsl(data[i], data[i + 1], data[i + 2]);
-      // on veut sature, ni trop sombre ni crame
       const score = s * (1 - Math.abs(l - 0.55) * 1.7);
       if (score > bestScore) { bestScore = score; best = [h, s, l]; }
     }
     if (!best || bestScore <= 0) return null;
     const light = document.documentElement.dataset.theme === "latte";
-    return hslToHex(
-      best[0],
+    return hslToHex(best[0],
       Math.min(0.92, Math.max(0.45, best[1])),
-      light ? 0.42 : Math.min(0.78, Math.max(0.62, best[2]))
-    );
+      light ? 0.42 : Math.min(0.78, Math.max(0.62, best[2])));
   }
 
   function applyAccent() {
@@ -595,8 +557,7 @@ button,input,textarea,select{font:inherit;color:inherit}
 
   // ── fond ────────────────────────────────────────────────────────────
   function applyBg(recompute) {
-    const root = document.documentElement;
-    const el = $("bg");
+    const root = document.documentElement, el = $("bg");
     root.style.setProperty("--dim", (cfg.bg.dim / 100).toFixed(2));
     if (!cfg.bg.src) {
       el.style.backgroundImage = "";
@@ -606,7 +567,6 @@ button,input,textarea,select{font:inherit;color:inherit}
     }
     el.style.backgroundImage = 'url("' + cfg.bg.src.replace(/"/g, '\\"') + '")';
     root.classList.add("has-bg");
-
     if (!cfg.bg.auto) { cfg.bg.accent = ""; applyAccent(); return; }
     if (cfg.bg.accent && !recompute) { applyAccent(); return; }
 
@@ -615,20 +575,16 @@ button,input,textarea,select{font:inherit;color:inherit}
     img.onload = () => {
       const hex = extractAccent(img);
       cfg.bg.accent = hex || "";
-      applyAccent();
-      renderFetch();
-      save();
+      applyAccent(); renderFetch(); save();
       if (!hex) bgFlash("image chargee, mais sa couleur n'a pas pu etre lue (CORS) : accent du theme conserve", "warn");
     };
     img.onerror = () => {
-      cfg.bg.accent = "";
-      applyAccent();
+      cfg.bg.accent = ""; applyAccent();
       bgFlash("image chargee pour l'affichage, analyse de couleur impossible", "warn");
     };
     img.src = cfg.bg.src;
   }
 
-  // Redimensionne puis encode en JPEG pour tenir dans le quota localStorage.
   function fileToDataUrl(file) {
     return new Promise((resolve, reject) => {
       const fr = new FileReader();
@@ -652,6 +608,57 @@ button,input,textarea,select{font:inherit;color:inherit}
     });
   }
 
+  // ── index et filtrage ───────────────────────────────────────────────
+  function buildIndex() {
+    index = [];
+    for (const c of cfg.cats) for (const l of c.links) index.push({ ...l, cat: c.name });
+  }
+
+  const fold = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+  function hostOf(url) {
+    try { return new URL(url).hostname.replace(/^www\./, ""); }
+    catch { return ""; }
+  }
+
+  // Classement : cle exacte > debut de nom > debut de domaine > contenu
+  function filterLinks(raw) {
+    const q = fold(raw.trim());
+    if (!q) return index.filter(l => l.pin).slice(0, MAX_RESULTS);
+    const out = [];
+    for (const l of index) {
+      const n = fold(l.name), h = fold(hostOf(l.url));
+      let s = 0;
+      if (l.key === q) s = 100;
+      else if (n.startsWith(q)) s = 80;
+      else if (h.startsWith(q)) s = 70;
+      else if (n.includes(q)) s = 50;
+      else if (h.includes(q)) s = 40;
+      else if (l.key.startsWith(q)) s = 30;
+      if (s) out.push({ l, s });
+    }
+    out.sort((a, b) => b.s - a.s || a.l.name.localeCompare(b.l.name));
+    return out.slice(0, MAX_RESULTS).map(x => x.l);
+  }
+
+  // ── recherche web ───────────────────────────────────────────────────
+  function parseQuery(raw) {
+    const s = raw.trim();
+    const bang = /^!([a-z]+)\s*([\s\S]*)$/i.exec(s);
+    if (bang) {
+      const b = BANGS[bang[1].toLowerCase()];
+      if (b) return { url: b[1] + encodeURIComponent(bang[2]), label: b[0] };
+    }
+    if (/^https?:\/\//i.test(s)) return { url: s, label: "url" };
+    if (!/\s/.test(s) && /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(s))
+      return { url: "https://" + s, label: "url" };
+    const [label, base] = ENGINES[cfg.engine] || ENGINES.ddg;
+    return { url: base + encodeURIComponent(s), label };
+  }
+
+  // Un bang ou une URL court-circuite le filtrage : on veut le web directement
+  const isDirect = s => /^!/.test(s.trim()) || /^https?:\/\//i.test(s.trim());
+
   // ── rendu ───────────────────────────────────────────────────────────
   function applyTheme() { document.documentElement.dataset.theme = cfg.theme; }
 
@@ -665,54 +672,70 @@ button,input,textarea,select{font:inherit;color:inherit}
     el.appendChild(b);
   }
 
-  function buildIndex() {
-    index = [];
-    cfg.cats.forEach((c, ti) => c.links.forEach(l => index.push({ ...l, tab: ti })));
-  }
-
-  function renderTabs() {
-    const box = $("tabs");
+  function renderResults() {
+    const raw = $("q").value;
+    const q = raw.trim();
+    const box = $("results");
     box.textContent = "";
-    cfg.cats.forEach((c, i) => {
-      const b = document.createElement("button");
-      b.className = "tab";
-      b.type = "button";
-      b.setAttribute("role", "tab");
-      b.setAttribute("aria-selected", String(i === active));
-      const num = document.createElement("span");
-      num.className = "num";
-      num.textContent = i + 1;
-      const nm = document.createElement("span");
-      nm.textContent = c.name;
-      b.append(num, nm);
-      b.addEventListener("click", () => { active = i; renderTabs(); renderLinks(); });
-      box.appendChild(b);
+
+    items = isDirect(raw) ? [] : filterLinks(raw).map(l => ({ type: "link", l }));
+    if (q) items.push({ type: "web", q });
+
+    if (sel >= items.length) sel = items.length - 1;
+    if (!q && items.length) sel = -1;
+    if (q && sel < 0) sel = 0;
+
+    items.forEach((it, i) => {
+      const row = document.createElement("div");
+      row.className = "res" + (it.type === "web" ? " web" : "");
+      row.setAttribute("role", "option");
+      row.setAttribute("aria-selected", String(i === sel));
+
+      const k = document.createElement("span");
+      k.className = "key";
+      k.textContent = it.type === "web" ? "↵" : it.l.key;
+
+      const n = document.createElement("span");
+      n.className = "name";
+      if (it.type === "web") {
+        n.textContent = "rechercher ";
+        const b = document.createElement("b");
+        b.textContent = it.q;
+        n.append(b);
+      } else {
+        n.textContent = it.l.name;
+      }
+
+      const c = document.createElement("span");
+      c.className = "cat";
+      c.textContent = it.type === "web" ? parseQuery(q).label : it.l.cat;
+
+      row.append(k, n, c);
+      row.addEventListener("mousedown", e => { e.preventDefault(); go(i); });
+      box.appendChild(row);
     });
   }
 
-  function renderLinks() {
-    const box = $("links");
-    box.textContent = "";
-    const cat = cfg.cats[active];
-    if (!cat) return;
-    for (const l of cat.links) {
-      const a = document.createElement("a");
-      a.href = l.url;
-      a.dataset.key = l.key;
-      a.rel = "noreferrer";
-      const k = document.createElement("span");
-      k.className = "key"; k.textContent = l.key;
-      const n = document.createElement("span");
-      n.className = "name"; n.textContent = l.name;
-      a.append(k, n);
-      box.appendChild(a);
-    }
+  function go(i) {
+    const it = items[i];
+    if (!it) return;
+    location.href = it.type === "web" ? parseQuery(it.q).url : it.l.url;
   }
 
-  function setTab(i) {
-    const n = cfg.cats.length;
-    active = ((i % n) + n) % n;
-    renderTabs(); renderLinks();
+  function move(d) {
+    if (!items.length) return;
+    sel = sel < 0 ? (d > 0 ? 0 : items.length - 1) : (sel + d + items.length) % items.length;
+    [...$("results").children].forEach((el, i) => el.setAttribute("aria-selected", String(i === sel)));
+  }
+
+  function updateChip() {
+    const v = $("q").value;
+    const chip = $("engineChip");
+    const def = ENGINES[cfg.engine][0];
+    if (!v.trim()) { chip.className = "chip engine"; chip.textContent = def; return; }
+    const r = parseQuery(v);
+    chip.className = r.label === def ? "chip engine" : "chip";
+    chip.textContent = r.label;
   }
 
   // ── horloge ─────────────────────────────────────────────────────────
@@ -790,65 +813,30 @@ button,input,textarea,select{font:inherit;color:inherit}
     el.append(who, rule, dl);
   }
 
-  // ── recherche ───────────────────────────────────────────────────────
-  function parseQuery(raw) {
-    const s = raw.trim();
-    const bang = /^!([a-z]+)\s*([\s\S]*)$/i.exec(s);
-    if (bang) {
-      const b = BANGS[bang[1].toLowerCase()];
-      if (b) return { url: b[1] + encodeURIComponent(bang[2]), label: b[0] };
-    }
-    if (/^https?:\/\//i.test(s)) return { url: s, label: "url" };
-    if (!/\s/.test(s) && /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(s))
-      return { url: "https://" + s, label: "url" };
-    const [label, base] = ENGINES[cfg.engine] || ENGINES.ddg;
-    return { url: base + encodeURIComponent(s), label };
-  }
-
-  function updateChip() {
-    const v = $("q").value;
-    const chip = $("engineChip");
-    const def = ENGINES[cfg.engine][0];
-    if (!v.trim()) { chip.className = "chip engine"; chip.textContent = def; return; }
-    const r = parseQuery(v);
-    chip.className = r.label === def ? "chip engine" : "chip";
-    chip.textContent = r.label;
-  }
-
+  // ── evenements barre ────────────────────────────────────────────────
   $("searchForm").addEventListener("submit", e => {
     e.preventDefault();
-    const v = $("q").value.trim();
-    if (!v) return;
-    location.href = parseQuery(v).url;
+    const raw = $("q").value.trim();
+    if (!raw) return;
+    if (sel >= 0 && items[sel]) go(sel);
+    else location.href = parseQuery(raw).url;
   });
-  $("q").addEventListener("input", updateChip);
 
-  // ── clavier ─────────────────────────────────────────────────────────
+  $("q").addEventListener("input", () => { sel = -1; updateChip(); renderResults(); });
+
+  $("q").addEventListener("keydown", e => {
+    if (e.key === "ArrowDown") { e.preventDefault(); move(1); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); move(-1); }
+  });
+
+  // ── clavier global ──────────────────────────────────────────────────
   let buf = "", bufTimer = null;
 
-  // Les raccourcis portent sur TOUS les liens, y compris ceux des onglets
-  // masques : la barre du bas montre alors les cibles possibles.
   function setBuf(s) {
     buf = s;
-    const box = $("matches");
-    box.textContent = "";
-    document.querySelectorAll(".links a.hot").forEach(a => a.classList.remove("hot"));
+    $("buffer").textContent = s;
     clearTimeout(bufTimer);
-    if (!s) return;
-
-    for (const l of index.filter(l => l.key.startsWith(s)).slice(0, 5)) {
-      const sp = document.createElement("span");
-      sp.textContent = l.key + " ";
-      const b = document.createElement("b");
-      b.textContent = l.name;
-      sp.appendChild(b);
-      box.appendChild(sp);
-      if (l.tab === active) {
-        const a = [...document.querySelectorAll(".links a")].find(x => x.dataset.key === l.key);
-        if (a) a.classList.add("hot");
-      }
-    }
-    bufTimer = setTimeout(() => setBuf(""), 1400);
+    if (s) bufTimer = setTimeout(() => setBuf(""), 1200);
   }
 
   document.addEventListener("keydown", e => {
@@ -858,7 +846,7 @@ button,input,textarea,select{font:inherit;color:inherit}
 
     if (e.key === "Escape") {
       if ($("overlay").classList.contains("open")) closePanel();
-      else if (typing) t.blur();
+      else if (typing) { $("q").value = ""; sel = -1; updateChip(); renderResults(); t.blur(); }
       setBuf("");
       return;
     }
@@ -866,14 +854,6 @@ button,input,textarea,select{font:inherit;color:inherit}
 
     if (e.key === "/") { e.preventDefault(); $("q").focus(); return; }
     if (e.key === "?") { e.preventDefault(); openPanel(); return; }
-    if (e.key === "ArrowLeft")  { e.preventDefault(); setTab(active - 1); setBuf(""); return; }
-    if (e.key === "ArrowRight") { e.preventDefault(); setTab(active + 1); setBuf(""); return; }
-
-    if (/^[1-9]$/.test(e.key)) {
-      const i = +e.key - 1;
-      if (i < cfg.cats.length) { setTab(i); setBuf(""); }
-      return;
-    }
 
     if (/^[a-zA-Z]$/.test(e.key)) {
       const c = e.key.toLowerCase();
@@ -926,19 +906,15 @@ button,input,textarea,select{font:inherit;color:inherit}
   const flash = (t, ok) => { const m = $("msg"); m.textContent = t; m.className = "msg " + (ok ? "ok" : "err"); };
   const bgFlash = (t, kind) => { const m = $("bgMsg"); m.textContent = t; m.className = "msg " + (kind || "ok"); };
 
-  // image : URL
   $("bgUrlBtn").addEventListener("click", () => {
     const v = $("fBgUrl").value.trim();
     if (!v) { bgFlash("colle une URL d'image d'abord", "err"); return; }
     if (!/^https?:\/\//i.test(v)) { bgFlash("l'URL doit commencer par http:// ou https://", "err"); return; }
-    cfg.bg.src = v;
-    cfg.bg.accent = "";
-    applyBg(true);
-    save();
+    cfg.bg.src = v; cfg.bg.accent = "";
+    applyBg(true); save();
     bgFlash("image appliquee", "ok");
   });
 
-  // image : fichier local
   $("bgFileBtn").addEventListener("click", () => $("bgFile").click());
   $("bgFile").addEventListener("change", async e => {
     const f = e.target.files && e.target.files[0];
@@ -948,20 +924,15 @@ button,input,textarea,select{font:inherit;color:inherit}
     try {
       const { url, w, h } = await fileToDataUrl(f);
       const prev = cfg.bg.src;
-      cfg.bg.src = url;
-      cfg.bg.accent = "";
-      const ok = save();
-      if (ok === "quota") {
-        cfg.bg.src = prev;
-        save();
+      cfg.bg.src = url; cfg.bg.accent = "";
+      if (save() === "quota") {
+        cfg.bg.src = prev; save();
         bgFlash("image trop lourde pour le stockage du navigateur : essaie une image plus petite", "err");
         return;
       }
       applyBg(true);
       bgFlash("image chargee (" + w + "x" + h + ", " + Math.round(url.length / 1024) + " Ko)", "ok");
-    } catch (err) {
-      bgFlash(err.message, "err");
-    }
+    } catch (err) { bgFlash(err.message, "err"); }
   });
 
   $("bgClear").addEventListener("click", () => {
@@ -995,9 +966,7 @@ button,input,textarea,select{font:inherit;color:inherit}
     cfg.name = $("fName").value.trim() || "toi";
     cfg.engine = $("fEngine").value;
     cfg.cats = normalized;
-    if (active >= cfg.cats.length) active = 0;
-    save();
-    renderAll();
+    save(); renderAll();
     $("fCats").value = JSON.stringify(cfg.cats, null, 2);
     flash("enregistre", true);
   });
@@ -1020,7 +989,6 @@ button,input,textarea,select{font:inherit;color:inherit}
     r.onload = () => {
       try {
         cfg = sanitize(JSON.parse(String(r.result)));
-        active = 0;
         save(); renderAll(); openPanel();
         flash("config importee", true);
       } catch (err) { flash("fichier illisible : " + err.message, false); }
@@ -1031,7 +999,6 @@ button,input,textarea,select{font:inherit;color:inherit}
   $("reset").addEventListener("click", () => {
     if (!confirm("Remettre la configuration par defaut ?")) return;
     cfg = clone(DEFAULTS);
-    active = 0;
     save(); renderAll(); openPanel();
     flash("reinitialise", true);
   });
@@ -1044,11 +1011,10 @@ button,input,textarea,select{font:inherit;color:inherit}
     applyTheme();
     buildIndex();
     renderGreeting();
-    renderTabs();
-    renderLinks();
     applyBg();
     renderFetch();
     updateChip();
+    renderResults();
     tick();
   }
 
