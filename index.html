@@ -15,57 +15,64 @@
 
 :root,
 :root[data-theme="mocha"]{
-  --base:#1e1e2e; --mantle:#181825; --surface:#313244; --line:#3f4157;
+  --base:#1e1e2e; --mantle:#181825; --line:#3f4157;
   --text:#cdd6f4; --subtext:#a6adc8; --muted:#6c7086;
-  --accent:#cba6f7; --accent2:#89b4fa; --green:#a6e3a1; --red:#f38ba8; --yellow:#f9e2af;
+  --theme-accent:#cba6f7; --accent2:#89b4fa; --green:#a6e3a1; --red:#f38ba8;
 }
 :root[data-theme="latte"]{
-  --base:#eff1f5; --mantle:#e6e9ef; --surface:#dce0e8; --line:#bcc0cc;
+  --base:#eff1f5; --mantle:#e6e9ef; --line:#bcc0cc;
   --text:#4c4f69; --subtext:#5c5f77; --muted:#8c8fa1;
-  --accent:#8839ef; --accent2:#1e66f5; --green:#40a02b; --red:#d20f39; --yellow:#df8e1d;
+  --theme-accent:#8839ef; --accent2:#1e66f5; --green:#40a02b; --red:#d20f39;
 }
 :root[data-theme="gruvbox"]{
-  --base:#282828; --mantle:#1d2021; --surface:#3c3836; --line:#504945;
+  --base:#282828; --mantle:#1d2021; --line:#504945;
   --text:#ebdbb2; --subtext:#d5c4a1; --muted:#928374;
-  --accent:#fe8019; --accent2:#83a598; --green:#b8bb26; --red:#fb4934; --yellow:#fabd2f;
+  --theme-accent:#fe8019; --accent2:#83a598; --green:#b8bb26; --red:#fb4934;
 }
 :root[data-theme="nord"]{
-  --base:#2e3440; --mantle:#272c36; --surface:#3b4252; --line:#4c566a;
+  --base:#2e3440; --mantle:#272c36; --line:#4c566a;
   --text:#eceff4; --subtext:#d8dee9; --muted:#7b88a1;
-  --accent:#88c0d0; --accent2:#81a1c1; --green:#a3be8c; --red:#bf616a; --yellow:#ebcb8b;
+  --theme-accent:#88c0d0; --accent2:#81a1c1; --green:#a3be8c; --red:#bf616a;
 }
 :root[data-theme="tokyonight"]{
-  --base:#1a1b26; --mantle:#16161e; --surface:#292e42; --line:#343a55;
+  --base:#1a1b26; --mantle:#16161e; --line:#343a55;
   --text:#c0caf5; --subtext:#a9b1d6; --muted:#565f89;
-  --accent:#bb9af7; --accent2:#7aa2f7; --green:#9ece6a; --red:#f7768e; --yellow:#e0af68;
+  --theme-accent:#bb9af7; --accent2:#7aa2f7; --green:#9ece6a; --red:#f7768e;
 }
 :root[data-theme="rosepine"]{
-  --base:#191724; --mantle:#1f1d2e; --surface:#26233a; --line:#312e45;
+  --base:#191724; --mantle:#1f1d2e; --line:#312e45;
   --text:#e0def4; --subtext:#908caa; --muted:#6e6a86;
-  --accent:#c4a7e7; --accent2:#9ccfd8; --green:#31748f; --red:#eb6f92; --yellow:#f6c177;
+  --theme-accent:#c4a7e7; --accent2:#9ccfd8; --green:#31748f; --red:#eb6f92;
 }
+/* --accent suit le theme, sauf si une image impose sa couleur dominante
+   (le JS ecrit alors --accent en inline sur :root) */
+:root{ --accent:var(--theme-accent) }
 
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
+html{height:100%}
 body{
+  position:relative; min-height:100%;
   background:var(--base);
   color:var(--text);
   font-family:"JetBrains Mono",ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SF Mono",Menlo,monospace;
-  font-size:15px;
-  line-height:1.5;
+  font-size:15px; line-height:1.5;
   -webkit-font-smoothing:antialiased;
   display:flex; flex-direction:column;
   overflow-x:hidden;
 }
-/* halo d'accent, tres leger */
+
+/* ── fond ─────────────────────────────────────────────────────────── */
+.bg{position:fixed;inset:0;z-index:0;background-position:center;background-size:cover;background-repeat:no-repeat}
+.bg::after{content:"";position:absolute;inset:0;background:var(--base);opacity:var(--dim,.78);transition:opacity .2s}
+/* halo d'accent, uniquement quand il n'y a pas d'image */
 body::before{
-  content:""; position:fixed; inset:-30%;
+  content:""; position:fixed; inset:-30%; z-index:0; pointer-events:none;
   background:
     radial-gradient(45% 40% at 22% 18%, color-mix(in srgb,var(--accent) 16%,transparent), transparent 70%),
     radial-gradient(45% 40% at 78% 82%, color-mix(in srgb,var(--accent2) 14%,transparent), transparent 70%);
-  pointer-events:none; z-index:0;
   animation:drift 34s ease-in-out infinite alternate;
 }
+:root.has-bg body::before{display:none}
 @keyframes drift{ to{ transform:translate3d(2.5%,-2%,0) scale(1.08) } }
 
 a{color:inherit;text-decoration:none}
@@ -75,10 +82,10 @@ button,input,textarea,select{font:inherit;color:inherit}
 /* ── layout ───────────────────────────────────────────────────────── */
 .wrap{
   position:relative; z-index:1;
-  flex:1; width:100%; max-width:940px; margin:0 auto;
-  padding:clamp(28px,7vh,72px) 22px 120px;
+  flex:1; width:100%; max-width:720px; margin:0 auto;
+  padding:clamp(28px,7vh,72px) 22px 90px;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:34px;
+  gap:30px;
 }
 
 /* horloge */
@@ -86,7 +93,7 @@ button,input,textarea,select{font:inherit;color:inherit}
 .greet{color:var(--subtext);font-size:.9rem;letter-spacing:.14em;text-transform:uppercase}
 .greet b{color:var(--accent);font-weight:500}
 .time{
-  font-size:clamp(3.6rem,13vw,7.5rem); font-weight:300; line-height:1;
+  font-size:clamp(3.4rem,12vw,6.8rem); font-weight:300; line-height:1;
   letter-spacing:-.03em; margin:.1em 0 .05em;
   font-variant-numeric:tabular-nums; display:flex; align-items:baseline; justify-content:center; gap:.02em;
 }
@@ -96,10 +103,10 @@ button,input,textarea,select{font:inherit;color:inherit}
 .date{color:var(--muted);font-size:.85rem;letter-spacing:.05em}
 
 /* recherche */
-.search{width:min(560px,100%);position:relative}
+.search{width:100%}
 .search form{
   display:flex; align-items:center; gap:12px;
-  background:color-mix(in srgb,var(--mantle) 80%,transparent);
+  background:color-mix(in srgb,var(--mantle) 78%,transparent);
   border:1px solid var(--line); border-radius:12px;
   padding:0 16px; height:52px;
   backdrop-filter:blur(14px);
@@ -116,46 +123,48 @@ button,input,textarea,select{font:inherit;color:inherit}
 }
 .chip.engine{background:none;color:var(--muted);border-color:var(--line)}
 
-/* categories */
-.cats{
-  width:100%;
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr));
-  gap:12px;
+/* onglets */
+.tabsRow{width:100%;display:flex;flex-direction:column;gap:10px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
+.tab{
+  cursor:pointer;background:none;border:1px solid transparent;border-radius:8px;
+  padding:5px 12px;font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);transition:color .15s,border-color .15s,background .15s;
+  display:flex;align-items:center;gap:7px;
 }
-.cat{
+.tab:hover{color:var(--subtext)}
+.tab[aria-selected=true]{color:var(--accent);border-color:var(--line);background:color-mix(in srgb,var(--mantle) 70%,transparent)}
+.tab .num{font-size:.66rem;color:var(--muted);opacity:.7}
+.tab[aria-selected=true] .num{color:var(--accent)}
+
+/* liens de l'onglet actif */
+.links{
   background:color-mix(in srgb,var(--mantle) 62%,transparent);
   border:1px solid var(--line); border-radius:14px;
-  padding:16px 16px 12px;
-  backdrop-filter:blur(14px);
-  transition:border-color .18s;
+  padding:14px; backdrop-filter:blur(14px);
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:2px 10px;
+  animation:fade .18s ease-out;
 }
-.cat:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
-.cat h2{
-  font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--accent); margin-bottom:10px;
-  display:flex;align-items:center;gap:8px;
-}
-.cat h2::after{content:"";flex:1;height:1px;background:var(--line)}
-.cat ul{list-style:none;display:flex;flex-direction:column;gap:1px}
-.cat li a{
+@keyframes fade{from{opacity:0;transform:translateY(4px)}}
+.links a{
   display:flex;align-items:center;gap:10px;
-  padding:5px 8px;margin:0 -8px;border-radius:7px;
-  color:var(--subtext); font-size:.88rem;
+  padding:6px 9px;border-radius:8px;
+  color:var(--subtext);font-size:.88rem;
   transition:background .14s,color .14s;
 }
-.cat li a:hover,.cat li a.hot{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--text)}
-.cat li a .key{
+.links a:hover,.links a.hot{background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--text)}
+.links a .key{
   font-size:.68rem;color:var(--muted);
   border:1px solid var(--line);border-radius:5px;
   padding:0 5px;min-width:24px;text-align:center;
   transition:color .14s,border-color .14s;
 }
-.cat li a:hover .key,.cat li a.hot .key{color:var(--accent);border-color:var(--accent)}
-.cat li a .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.links a:hover .key,.links a.hot .key{color:var(--accent);border-color:var(--accent)}
+.links a .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* fetch (facon neofetch) */
 .fetch{
-  position:fixed;left:26px;bottom:22px;z-index:1;
+  position:absolute;left:26px;bottom:22px;z-index:1;
   font-size:.74rem;color:var(--muted);line-height:1.65;
 }
 .fetch .who{color:var(--accent);font-weight:500}
@@ -167,28 +176,24 @@ button,input,textarea,select{font:inherit;color:inherit}
 
 /* barre d'aide */
 .hints{
-  position:fixed;right:26px;bottom:22px;z-index:1;
-  display:flex;align-items:center;gap:14px;
+  position:absolute;right:26px;bottom:22px;z-index:1;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end;
   font-size:.74rem;color:var(--muted);
 }
-.hints kbd{
-  border:1px solid var(--line);border-radius:5px;padding:1px 6px;
-  color:var(--subtext);font-size:.7rem;
-}
-.buffer{color:var(--accent);letter-spacing:.2em;min-width:2ch}
+.hints kbd{border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--subtext);font-size:.7rem}
+.matches{color:var(--accent);display:flex;gap:10px}
+.matches b{font-weight:400;color:var(--subtext)}
 
 /* panneau reglages */
 .overlay{
   position:fixed;inset:0;z-index:10;display:none;
   background:color-mix(in srgb,var(--base) 72%,transparent);
-  backdrop-filter:blur(6px);
-  padding:24px; overflow-y:auto;
+  backdrop-filter:blur(6px); padding:24px; overflow-y:auto;
 }
 .overlay.open{display:flex;align-items:flex-start;justify-content:center}
 .panel{
-  width:min(620px,100%); margin:auto;
-  background:var(--mantle); border:1px solid var(--line); border-radius:16px;
-  padding:24px;
+  width:min(620px,100%);margin:auto;
+  background:var(--mantle);border:1px solid var(--line);border-radius:16px;padding:24px;
   animation:pop .16s ease-out;
 }
 @keyframes pop{from{opacity:0;transform:translateY(8px)}}
@@ -199,16 +204,17 @@ button,input,textarea,select{font:inherit;color:inherit}
 .field{margin-bottom:18px}
 .field label{display:block;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
 .field input[type=text],.field select,.field textarea{
-  width:100%;background:var(--base);border:1px solid var(--line);border-radius:9px;
-  padding:9px 12px;outline:none;
+  width:100%;background:var(--base);border:1px solid var(--line);border-radius:9px;padding:9px 12px;outline:none;
 }
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
-.field textarea{min-height:210px;resize:vertical;font-size:.8rem;line-height:1.6;white-space:pre;tab-size:2}
+.field textarea{min-height:190px;resize:vertical;font-size:.8rem;line-height:1.6;white-space:pre;tab-size:2}
+.field input[type=range]{width:100%;accent-color:var(--accent)}
+.check{display:flex;align-items:center;gap:9px;font-size:.82rem;color:var(--subtext);cursor:pointer}
+.check input{accent-color:var(--accent);width:16px;height:16px}
 .swatches{display:flex;flex-wrap:wrap;gap:8px}
 .sw{
-  cursor:pointer;border:1px solid var(--line);border-radius:9px;
-  padding:7px 11px;font-size:.78rem;background:none;color:var(--subtext);
-  display:flex;align-items:center;gap:8px;
+  cursor:pointer;border:1px solid var(--line);border-radius:9px;padding:7px 11px;
+  font-size:.78rem;background:none;color:var(--subtext);display:flex;align-items:center;gap:8px;
 }
 .sw:hover{border-color:var(--accent2)}
 .sw[aria-pressed=true]{border-color:var(--accent);color:var(--text)}
@@ -216,28 +222,32 @@ button,input,textarea,select{font:inherit;color:inherit}
 .row{display:flex;gap:9px;flex-wrap:wrap}
 .btn{
   cursor:pointer;background:none;border:1px solid var(--line);border-radius:9px;
-  padding:9px 15px;font-size:.82rem;color:var(--subtext);
-  transition:border-color .15s,color .15s;
+  padding:9px 15px;font-size:.82rem;color:var(--subtext);transition:border-color .15s,color .15s;
 }
 .btn:hover{border-color:var(--accent);color:var(--text)}
 .btn.primary{border-color:var(--accent);color:var(--accent)}
 .btn.danger:hover{border-color:var(--red);color:var(--red)}
 .msg{font-size:.78rem;margin-top:9px;min-height:1.2em}
-.msg.ok{color:var(--green)} .msg.err{color:var(--red)}
+.msg.ok{color:var(--green)} .msg.err{color:var(--red)} .msg.warn{color:var(--accent2)}
 .help{font-size:.74rem;color:var(--muted);margin-top:7px;line-height:1.7}
 .help code{color:var(--accent2)}
+.sep{height:1px;background:var(--line);margin:22px 0}
 
 @media (max-width:900px){ .fetch{display:none} }
+@media (min-width:901px){ .wrap{padding-bottom:220px} }
 @media (max-width:560px){
   .hints{left:0;right:0;justify-content:center}
-  .wrap{padding-top:34px;gap:26px}
+  .wrap{padding-top:34px;gap:24px}
 }
 @media (prefers-reduced-motion:reduce){
-  body::before{animation:none} .time .sep{animation:none} .panel{animation:none}
+  body::before{animation:none} .time .sep{animation:none}
+  .panel,.links{animation:none}
 }
 </style>
 </head>
 <body>
+
+<div class="bg" id="bg"></div>
 
 <main class="wrap">
   <section class="clock">
@@ -256,16 +266,19 @@ button,input,textarea,select{font:inherit;color:inherit}
     </form>
   </section>
 
-  <section class="cats" id="cats"></section>
+  <section class="tabsRow">
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Categories"></nav>
+    <div class="links" id="links" role="tabpanel"></div>
+  </section>
 </main>
 
 <aside class="fetch" id="fetch"></aside>
 
 <div class="hints">
-  <span class="buffer" id="buffer"></span>
+  <span class="matches" id="matches"></span>
   <span><kbd>/</kbd> rechercher</span>
+  <span><kbd>&larr;</kbd><kbd>&rarr;</kbd> onglets</span>
   <span><kbd>?</kbd> reglages</span>
-  <span><kbd>2 lettres</kbd> ouvrir</span>
 </div>
 
 <div class="overlay" id="overlay">
@@ -296,12 +309,51 @@ button,input,textarea,select{font:inherit;color:inherit}
       </select>
     </div>
 
+    <div class="sep"></div>
+
+    <div class="field">
+      <label for="fBgUrl">Image de fond &mdash; URL</label>
+      <input id="fBgUrl" type="text" placeholder="https://.../wallpaper.jpg">
+      <div class="row" style="margin-top:9px">
+        <button class="btn" id="bgUrlBtn">Charger l'URL</button>
+        <button class="btn" id="bgFileBtn">Choisir un fichier</button>
+        <button class="btn danger" id="bgClear">Retirer l'image</button>
+        <input type="file" id="bgFile" accept="image/*" hidden>
+      </div>
+      <p class="help">
+        Les fichiers locaux sont redimensionnes (max 1920px de large) avant d'etre
+        stockes dans le navigateur, pour tenir dans le quota.
+      </p>
+      <p class="msg" id="bgMsg"></p>
+    </div>
+
+    <div class="field">
+      <label for="fDim">Assombrissement <span id="dimVal" style="color:var(--subtext)"></span></label>
+      <input id="fDim" type="range" min="0" max="95" step="1">
+    </div>
+
+    <div class="field">
+      <label class="check">
+        <input type="checkbox" id="fAuto">
+        Reprendre la couleur dominante de l'image comme accent
+      </label>
+      <p class="help">
+        Necessite que l'image soit lisible par le navigateur. Une image distante
+        servie sans en-tetes CORS ne peut pas etre analysee : l'accent du theme
+        est alors conserve.
+      </p>
+    </div>
+
+    <div class="sep"></div>
+
     <div class="field">
       <label for="fCats">Liens (JSON)</label>
       <textarea id="fCats" spellcheck="false"></textarea>
       <p class="help">
         Format : <code>[{ "name":"dev", "links":[{ "name":"GitHub", "url":"...", "key":"gh" }] }]</code><br>
-        <code>key</code> = les 2 lettres a taper pour ouvrir le lien. Laisse vide pour generer automatiquement.
+        Chaque entree du tableau devient un onglet. <code>key</code> = les 2 lettres
+        a taper pour ouvrir le lien, depuis n'importe quel onglet. Laisse vide pour
+        generer automatiquement.
       </p>
       <p class="msg" id="msg"></p>
     </div>
@@ -320,7 +372,7 @@ button,input,textarea,select{font:inherit;color:inherit}
 (() => {
   "use strict";
 
-  const KEY = "startpage.config.v1";
+  const KEY = "startpage.config.v3";
 
   const THEMES = [
     ["mocha",      "catppuccin mocha", "#cba6f7"],
@@ -339,7 +391,6 @@ button,input,textarea,select{font:inherit;color:inherit}
     ecosia:    ["ecosia",    "https://www.ecosia.org/search?q="],
   };
 
-  // !bang -> [libelle, url]
   const BANGS = {
     g:   ["google",         "https://www.google.com/search?q="],
     d:   ["ddg",            "https://duckduckgo.com/?q="],
@@ -359,30 +410,48 @@ button,input,textarea,select{font:inherit;color:inherit}
     name: "gonni",
     theme: "mocha",
     engine: "ddg",
+    bg: { src: "", dim: 78, auto: true, accent: "" },
     cats: [
+      { name: "perso", links: [
+        { name: "GitHub",          url: "https://github.com/G0nni",     key: "gh" },
+        { name: "Portfolio",       url: "https://nicolas-cros.fr",      key: "pf" },
+        { name: "Blog",            url: "https://anindividual.me",      key: "bl" },
+        { name: "Soso Dedeck",     url: "https://soso-dedeck.fr",       key: "sd" },
+        { name: "ArtistDiscovery", url: "https://artist-discovery.com", key: "ad" },
+      ]},
       { name: "dev", links: [
-        { name: "GitHub",         url: "https://github.com/G0nni",         key: "gh" },
-        { name: "Claude",         url: "https://claude.ai",                key: "cl" },
-        { name: "MDN",            url: "https://developer.mozilla.org/fr/", key: "md" },
-        { name: "Stack Overflow", url: "https://stackoverflow.com",        key: "so" },
-        { name: "Vercel",         url: "https://vercel.com/dashboard",     key: "vc" },
+        { name: "Claude",   url: "https://claude.ai",                 key: "cl" },
+        { name: "ChatGPT",  url: "https://chatgpt.com",               key: "cg" },
+        { name: "v0",       url: "https://v0.dev",                    key: "vd" },
+        { name: "Next.js",  url: "https://nextjs.org/docs",           key: "nx" },
+        { name: "Tailwind", url: "https://tailwindcss.com/docs",      key: "tl" },
+        { name: "MDN",      url: "https://developer.mozilla.org/fr/", key: "md" },
+      ]},
+      { name: "outils", links: [
+        { name: "Excalidraw", url: "https://excalidraw.com",            key: "ex" },
+        { name: "Squoosh",    url: "https://squoosh.app",               key: "sq" },
+        { name: "regex101",   url: "https://regex101.com",              key: "re" },
+        { name: "CyberChef",  url: "https://gchq.github.io/CyberChef/", key: "cc" },
+        { name: "Carbon",     url: "https://carbon.now.sh",             key: "cb" },
       ]},
       { name: "media", links: [
-        { name: "YouTube",     url: "https://www.youtube.com",     key: "yt" },
-        { name: "Crunchyroll", url: "https://www.crunchyroll.com", key: "cr" },
-        { name: "Twitch",      url: "https://www.twitch.tv",       key: "tw" },
-        { name: "Spotify",     url: "https://open.spotify.com",    key: "sp" },
-      ]},
-      { name: "social", links: [
-        { name: "Reddit",     url: "https://www.reddit.com",             key: "rd" },
-        { name: "r/unixporn", url: "https://www.reddit.com/r/unixporn/", key: "up" },
-        { name: "Discord",    url: "https://discord.com/app",            key: "ds" },
-        { name: "Gmail",      url: "https://mail.google.com",            key: "ml" },
+        { name: "Stremio",       url: "https://web.stremio.com",   key: "st" },
+        { name: "YouTube",       url: "https://www.youtube.com",   key: "yt" },
+        { name: "YouTube Music", url: "https://music.youtube.com", key: "ym" },
+        { name: "Twitch",        url: "https://www.twitch.tv",     key: "tw" },
       ]},
       { name: "veille", links: [
-        { name: "Hacker News", url: "https://news.ycombinator.com", key: "hn" },
-        { name: "Lobsters",    url: "https://lobste.rs",            key: "lo" },
-        { name: "Le Monde",    url: "https://www.lemonde.fr",       key: "lm" },
+        { name: "Hacker News",        url: "https://news.ycombinator.com",    key: "hn" },
+        { name: "Lobsters",           url: "https://lobste.rs",               key: "lo" },
+        { name: "Journal du Hacker",  url: "https://www.journalduhacker.net", key: "jh" },
+        { name: "LinuxFr",            url: "https://linuxfr.org",             key: "lf" },
+        { name: "This Week in React", url: "https://thisweekinreact.com",     key: "wr" },
+      ]},
+      { name: "inspi", links: [
+        { name: "Awwwards",  url: "https://www.awwwards.com", key: "aw" },
+        { name: "Godly",     url: "https://godly.website",    key: "go" },
+        { name: "Land-book", url: "https://land-book.com",    key: "lb" },
+        { name: "Mobbin",    url: "https://mobbin.com",       key: "mo" },
       ]},
     ],
   };
@@ -390,6 +459,8 @@ button,input,textarea,select{font:inherit;color:inherit}
   // ── etat ────────────────────────────────────────────────────────────
   const clone = o => JSON.parse(JSON.stringify(o));
   let cfg = load();
+  let active = 0;          // index de l'onglet courant
+  let index = [];          // liens aplatis : {key, url, name, tab}
 
   function load() {
     try {
@@ -405,7 +476,18 @@ button,input,textarea,select{font:inherit;color:inherit}
     if (typeof o.name === "string") base.name = o.name;
     if (THEMES.some(t => t[0] === o.theme)) base.theme = o.theme;
     if (ENGINES[o.engine]) base.engine = o.engine;
-    if (Array.isArray(o.cats)) base.cats = normalizeCats(o.cats);
+    if (Array.isArray(o.cats)) {
+      const cats = normalizeCats(o.cats);
+      if (cats.length) base.cats = cats;
+    }
+    if (o.bg && typeof o.bg === "object") {
+      base.bg = {
+        src:    typeof o.bg.src === "string" ? o.bg.src : "",
+        dim:    Number.isFinite(+o.bg.dim) ? Math.min(95, Math.max(0, +o.bg.dim)) : 78,
+        auto:   o.bg.auto !== false,
+        accent: /^#[0-9a-f]{6}$/i.test(o.bg.accent || "") ? o.bg.accent : "",
+      };
+    }
     return base;
   }
 
@@ -423,10 +505,10 @@ button,input,textarea,select{font:inherit;color:inherit}
             taken.add(key);
             return { name: l.name, url: l.url.trim(), key };
           }),
-      }));
+      }))
+      .filter(c => c.links.length);
   }
 
-  // derive 2 lettres libres a partir du nom du lien
   function autoKey(name, taken) {
     const s = name.toLowerCase().replace(/[^a-z]/g, "") || "xx";
     const tries = [];
@@ -439,15 +521,139 @@ button,input,textarea,select{font:inherit;color:inherit}
 
   function save() {
     cfg.cats = normalizeCats(cfg.cats);
-    try { localStorage.setItem(KEY, JSON.stringify(cfg)); } catch {}
+    try {
+      localStorage.setItem(KEY, JSON.stringify(cfg));
+      return true;
+    } catch (err) {
+      return err && err.name === "QuotaExceededError" ? "quota" : false;
+    }
+  }
+
+  const $ = id => document.getElementById(id);
+
+  // ── couleur ─────────────────────────────────────────────────────────
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    if (max === min) return [0, 0, l];
+    const d = max - min;
+    const s = l > .5 ? d / (2 - max - min) : d / (max + min);
+    let h;
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+    else if (max === g) h = ((b - r) / d + 2) / 6;
+    else h = ((r - g) / d + 4) / 6;
+    return [h, s, l];
+  }
+
+  function hslToHex(h, s, l) {
+    const f = n => {
+      const k = (n + h * 12) % 12;
+      const a = s * Math.min(l, 1 - l);
+      const v = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+      return Math.round(v * 255).toString(16).padStart(2, "0");
+    };
+    return "#" + f(0) + f(8) + f(4);
+  }
+
+  // Echantillonne l'image et retient la teinte la plus vive, puis la ramene
+  // dans une plage lisible sur le fond du theme.
+  function extractAccent(img) {
+    const S = 64;
+    const c = document.createElement("canvas");
+    c.width = S; c.height = S;
+    const ctx = c.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(img, 0, 0, S, S);
+    let data;
+    try {
+      data = ctx.getImageData(0, 0, S, S).data;   // leve si l'image taint le canvas
+    } catch {
+      return null;
+    }
+    let best = null, bestScore = -1;
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] < 128) continue;
+      const [h, s, l] = rgbToHsl(data[i], data[i + 1], data[i + 2]);
+      // on veut sature, ni trop sombre ni crame
+      const score = s * (1 - Math.abs(l - 0.55) * 1.7);
+      if (score > bestScore) { bestScore = score; best = [h, s, l]; }
+    }
+    if (!best || bestScore <= 0) return null;
+    const light = document.documentElement.dataset.theme === "latte";
+    return hslToHex(
+      best[0],
+      Math.min(0.92, Math.max(0.45, best[1])),
+      light ? 0.42 : Math.min(0.78, Math.max(0.62, best[2]))
+    );
+  }
+
+  function applyAccent() {
+    const root = document.documentElement;
+    if (cfg.bg.src && cfg.bg.auto && cfg.bg.accent) root.style.setProperty("--accent", cfg.bg.accent);
+    else root.style.removeProperty("--accent");
+  }
+
+  // ── fond ────────────────────────────────────────────────────────────
+  function applyBg(recompute) {
+    const root = document.documentElement;
+    const el = $("bg");
+    root.style.setProperty("--dim", (cfg.bg.dim / 100).toFixed(2));
+    if (!cfg.bg.src) {
+      el.style.backgroundImage = "";
+      root.classList.remove("has-bg");
+      applyAccent();
+      return;
+    }
+    el.style.backgroundImage = 'url("' + cfg.bg.src.replace(/"/g, '\\"') + '")';
+    root.classList.add("has-bg");
+
+    if (!cfg.bg.auto) { cfg.bg.accent = ""; applyAccent(); return; }
+    if (cfg.bg.accent && !recompute) { applyAccent(); return; }
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const hex = extractAccent(img);
+      cfg.bg.accent = hex || "";
+      applyAccent();
+      renderFetch();
+      save();
+      if (!hex) bgFlash("image chargee, mais sa couleur n'a pas pu etre lue (CORS) : accent du theme conserve", "warn");
+    };
+    img.onerror = () => {
+      cfg.bg.accent = "";
+      applyAccent();
+      bgFlash("image chargee pour l'affichage, analyse de couleur impossible", "warn");
+    };
+    img.src = cfg.bg.src;
+  }
+
+  // Redimensionne puis encode en JPEG pour tenir dans le quota localStorage.
+  function fileToDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onerror = () => reject(new Error("lecture impossible"));
+      fr.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error("ce fichier n'est pas une image valide"));
+        img.onload = () => {
+          const MAX = 1920;
+          const scale = Math.min(1, MAX / img.naturalWidth);
+          const w = Math.round(img.naturalWidth * scale);
+          const h = Math.round(img.naturalHeight * scale);
+          const c = document.createElement("canvas");
+          c.width = w; c.height = h;
+          c.getContext("2d").drawImage(img, 0, 0, w, h);
+          resolve({ url: c.toDataURL("image/jpeg", 0.82), w, h });
+        };
+        img.src = String(fr.result);
+      };
+      fr.readAsDataURL(file);
+    });
   }
 
   // ── rendu ───────────────────────────────────────────────────────────
-  const $ = id => document.getElementById(id);
-
-  function applyTheme() {
-    document.documentElement.dataset.theme = cfg.theme;
-  }
+  function applyTheme() { document.documentElement.dataset.theme = cfg.theme; }
 
   function renderGreeting() {
     const h = new Date().getHours();
@@ -459,33 +665,54 @@ button,input,textarea,select{font:inherit;color:inherit}
     el.appendChild(b);
   }
 
-  function renderCats() {
-    const box = $("cats");
+  function buildIndex() {
+    index = [];
+    cfg.cats.forEach((c, ti) => c.links.forEach(l => index.push({ ...l, tab: ti })));
+  }
+
+  function renderTabs() {
+    const box = $("tabs");
     box.textContent = "";
-    for (const cat of cfg.cats) {
-      const sec = document.createElement("div");
-      sec.className = "cat";
-      const h = document.createElement("h2");
-      h.textContent = cat.name;
-      sec.appendChild(h);
-      const ul = document.createElement("ul");
-      for (const l of cat.links) {
-        const li = document.createElement("li");
-        const a = document.createElement("a");
-        a.href = l.url;
-        a.dataset.key = l.key;
-        a.rel = "noreferrer";
-        const k = document.createElement("span");
-        k.className = "key"; k.textContent = l.key;
-        const n = document.createElement("span");
-        n.className = "name"; n.textContent = l.name;
-        a.append(k, n);
-        li.appendChild(a);
-        ul.appendChild(li);
-      }
-      sec.appendChild(ul);
-      box.appendChild(sec);
+    cfg.cats.forEach((c, i) => {
+      const b = document.createElement("button");
+      b.className = "tab";
+      b.type = "button";
+      b.setAttribute("role", "tab");
+      b.setAttribute("aria-selected", String(i === active));
+      const num = document.createElement("span");
+      num.className = "num";
+      num.textContent = i + 1;
+      const nm = document.createElement("span");
+      nm.textContent = c.name;
+      b.append(num, nm);
+      b.addEventListener("click", () => { active = i; renderTabs(); renderLinks(); });
+      box.appendChild(b);
+    });
+  }
+
+  function renderLinks() {
+    const box = $("links");
+    box.textContent = "";
+    const cat = cfg.cats[active];
+    if (!cat) return;
+    for (const l of cat.links) {
+      const a = document.createElement("a");
+      a.href = l.url;
+      a.dataset.key = l.key;
+      a.rel = "noreferrer";
+      const k = document.createElement("span");
+      k.className = "key"; k.textContent = l.key;
+      const n = document.createElement("span");
+      n.className = "name"; n.textContent = l.name;
+      a.append(k, n);
+      box.appendChild(a);
     }
+  }
+
+  function setTab(i) {
+    const n = cfg.cats.length;
+    active = ((i % n) + n) % n;
+    renderTabs(); renderLinks();
   }
 
   // ── horloge ─────────────────────────────────────────────────────────
@@ -504,15 +731,15 @@ button,input,textarea,select{font:inherit;color:inherit}
     if (el) el.textContent = pad(Math.floor(up / 3600)) + ":" + pad(Math.floor(up / 60) % 60) + ":" + pad(up % 60);
   }
 
-  // ── fetch (facon neofetch) ──────────────────────────────────────────
+  // ── fetch ───────────────────────────────────────────────────────────
   function detectBrowser() {
     const ua = navigator.userAgent;
     let m;
-    if ((m = /Firefox\/(\d+)/.exec(ua)))            return "firefox " + m[1];
-    if ((m = /Edg\/(\d+)/.exec(ua)))                return "edge " + m[1];
-    if ((m = /OPR\/(\d+)/.exec(ua)))                return "opera " + m[1];
-    if ((m = /Chrome\/(\d+)/.exec(ua)))             return "chrome " + m[1];
-    if ((m = /Version\/(\d+).*Safari/.exec(ua)))    return "safari " + m[1];
+    if ((m = /Firefox\/(\d+)/.exec(ua)))         return "firefox " + m[1];
+    if ((m = /Edg\/(\d+)/.exec(ua)))             return "edge " + m[1];
+    if ((m = /OPR\/(\d+)/.exec(ua)))             return "opera " + m[1];
+    if ((m = /Chrome\/(\d+)/.exec(ua)))          return "chrome " + m[1];
+    if ((m = /Version\/(\d+).*Safari/.exec(ua))) return "safari " + m[1];
     return "navigateur";
   }
 
@@ -528,13 +755,14 @@ button,input,textarea,select{font:inherit;color:inherit}
   }
 
   function renderFetch() {
+    const accent = cfg.bg.src && cfg.bg.auto && cfg.bg.accent ? cfg.bg.accent : cfg.theme;
     const rows = [
       ["os",      detectOS()],
       ["browser", detectBrowser()],
       ["shell",   "startpage.html"],
       ["res",     screen.width + "x" + screen.height],
-      ["theme",   cfg.theme],
-      ["links",   String(cfg.cats.reduce((n, c) => n + c.links.length, 0))],
+      ["theme",   accent],
+      ["links",   String(index.length)],
       ["uptime",  "00:00:00"],
     ];
     const host = location.hostname || "local";
@@ -562,7 +790,7 @@ button,input,textarea,select{font:inherit;color:inherit}
     el.append(who, rule, dl);
   }
 
-  // ── recherche + bangs ───────────────────────────────────────────────
+  // ── recherche ───────────────────────────────────────────────────────
   function parseQuery(raw) {
     const s = raw.trim();
     const bang = /^!([a-z]+)\s*([\s\S]*)$/i.exec(s);
@@ -570,11 +798,9 @@ button,input,textarea,select{font:inherit;color:inherit}
       const b = BANGS[bang[1].toLowerCase()];
       if (b) return { url: b[1] + encodeURIComponent(bang[2]), label: b[0] };
     }
-    // une URL ou un domaine tape directement -> on y va
     if (/^https?:\/\//i.test(s)) return { url: s, label: "url" };
     if (!/\s/.test(s) && /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(s))
       return { url: "https://" + s, label: "url" };
-
     const [label, base] = ENGINES[cfg.engine] || ENGINES.ddg;
     return { url: base + encodeURIComponent(s), label };
   }
@@ -583,11 +809,7 @@ button,input,textarea,select{font:inherit;color:inherit}
     const v = $("q").value;
     const chip = $("engineChip");
     const def = ENGINES[cfg.engine][0];
-    if (!v.trim()) {
-      chip.className = "chip engine";
-      chip.textContent = def;
-      return;
-    }
+    if (!v.trim()) { chip.className = "chip engine"; chip.textContent = def; return; }
     const r = parseQuery(v);
     chip.className = r.label === def ? "chip engine" : "chip";
     chip.textContent = r.label;
@@ -601,20 +823,32 @@ button,input,textarea,select{font:inherit;color:inherit}
   });
   $("q").addEventListener("input", updateChip);
 
-  // ── raccourcis clavier ──────────────────────────────────────────────
+  // ── clavier ─────────────────────────────────────────────────────────
   let buf = "", bufTimer = null;
 
+  // Les raccourcis portent sur TOUS les liens, y compris ceux des onglets
+  // masques : la barre du bas montre alors les cibles possibles.
   function setBuf(s) {
     buf = s;
-    $("buffer").textContent = s;
-    document.querySelectorAll(".cat a.hot").forEach(a => a.classList.remove("hot"));
-    if (s) {
-      document.querySelectorAll(".cat a").forEach(a => {
-        if (a.dataset.key.startsWith(s)) a.classList.add("hot");
-      });
-    }
+    const box = $("matches");
+    box.textContent = "";
+    document.querySelectorAll(".links a.hot").forEach(a => a.classList.remove("hot"));
     clearTimeout(bufTimer);
-    if (s) bufTimer = setTimeout(() => setBuf(""), 1200);
+    if (!s) return;
+
+    for (const l of index.filter(l => l.key.startsWith(s)).slice(0, 5)) {
+      const sp = document.createElement("span");
+      sp.textContent = l.key + " ";
+      const b = document.createElement("b");
+      b.textContent = l.name;
+      sp.appendChild(b);
+      box.appendChild(sp);
+      if (l.tab === active) {
+        const a = [...document.querySelectorAll(".links a")].find(x => x.dataset.key === l.key);
+        if (a) a.classList.add("hot");
+      }
+    }
+    bufTimer = setTimeout(() => setBuf(""), 1400);
   }
 
   document.addEventListener("keydown", e => {
@@ -632,25 +866,38 @@ button,input,textarea,select{font:inherit;color:inherit}
 
     if (e.key === "/") { e.preventDefault(); $("q").focus(); return; }
     if (e.key === "?") { e.preventDefault(); openPanel(); return; }
+    if (e.key === "ArrowLeft")  { e.preventDefault(); setTab(active - 1); setBuf(""); return; }
+    if (e.key === "ArrowRight") { e.preventDefault(); setTab(active + 1); setBuf(""); return; }
+
+    if (/^[1-9]$/.test(e.key)) {
+      const i = +e.key - 1;
+      if (i < cfg.cats.length) { setTab(i); setBuf(""); }
+      return;
+    }
 
     if (/^[a-zA-Z]$/.test(e.key)) {
       const c = e.key.toLowerCase();
-      const links = [...document.querySelectorAll(".cat a")];
       const next = (buf + c).slice(-2);
-      const hit = links.find(a => a.dataset.key === next);
-      if (hit) { setBuf(""); location.href = hit.href; return; }
-      // on ne garde le tampon que si une cible commence par cette lettre
-      setBuf(links.some(a => a.dataset.key.startsWith(c)) ? c : "");
+      const hit = index.find(l => l.key === next);
+      if (hit) { setBuf(""); location.href = hit.url; return; }
+      setBuf(index.some(l => l.key.startsWith(c)) ? c : "");
     }
   });
 
-  // ── panneau reglages ────────────────────────────────────────────────
+  // ── panneau ─────────────────────────────────────────────────────────
   function openPanel() {
     $("fName").value = cfg.name;
     $("fEngine").value = cfg.engine;
     $("fCats").value = JSON.stringify(cfg.cats, null, 2);
+    $("fBgUrl").value = /^data:/.test(cfg.bg.src) ? "" : cfg.bg.src;
+    $("fDim").value = cfg.bg.dim;
+    $("fAuto").checked = cfg.bg.auto;
+    $("dimVal").textContent = cfg.bg.dim + "%";
     renderThemeButtons();
     $("msg").textContent = "";
+    $("bgMsg").textContent = /^data:/.test(cfg.bg.src)
+      ? "image locale chargee (" + Math.round(cfg.bg.src.length / 1024) + " Ko)" : "";
+    $("bgMsg").className = "msg";
     $("overlay").classList.add("open");
     $("fName").focus();
   }
@@ -661,8 +908,7 @@ button,input,textarea,select{font:inherit;color:inherit}
     box.textContent = "";
     for (const [id, label, color] of THEMES) {
       const b = document.createElement("button");
-      b.className = "sw";
-      b.type = "button";
+      b.className = "sw"; b.type = "button";
       b.setAttribute("aria-pressed", String(cfg.theme === id));
       const dot = document.createElement("i");
       dot.style.background = color;
@@ -671,32 +917,85 @@ button,input,textarea,select{font:inherit;color:inherit}
       b.append(dot, span);
       b.addEventListener("click", () => {
         cfg.theme = id;
-        applyTheme(); save(); renderThemeButtons(); renderFetch(); tick();
+        applyTheme(); applyAccent(); save(); renderThemeButtons(); renderFetch(); tick();
       });
       box.appendChild(b);
     }
   }
 
-  function flash(text, ok) {
-    const m = $("msg");
-    m.textContent = text;
-    m.className = "msg " + (ok ? "ok" : "err");
-  }
+  const flash = (t, ok) => { const m = $("msg"); m.textContent = t; m.className = "msg " + (ok ? "ok" : "err"); };
+  const bgFlash = (t, kind) => { const m = $("bgMsg"); m.textContent = t; m.className = "msg " + (kind || "ok"); };
+
+  // image : URL
+  $("bgUrlBtn").addEventListener("click", () => {
+    const v = $("fBgUrl").value.trim();
+    if (!v) { bgFlash("colle une URL d'image d'abord", "err"); return; }
+    if (!/^https?:\/\//i.test(v)) { bgFlash("l'URL doit commencer par http:// ou https://", "err"); return; }
+    cfg.bg.src = v;
+    cfg.bg.accent = "";
+    applyBg(true);
+    save();
+    bgFlash("image appliquee", "ok");
+  });
+
+  // image : fichier local
+  $("bgFileBtn").addEventListener("click", () => $("bgFile").click());
+  $("bgFile").addEventListener("change", async e => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!f) return;
+    bgFlash("traitement de l'image...", "warn");
+    try {
+      const { url, w, h } = await fileToDataUrl(f);
+      const prev = cfg.bg.src;
+      cfg.bg.src = url;
+      cfg.bg.accent = "";
+      const ok = save();
+      if (ok === "quota") {
+        cfg.bg.src = prev;
+        save();
+        bgFlash("image trop lourde pour le stockage du navigateur : essaie une image plus petite", "err");
+        return;
+      }
+      applyBg(true);
+      bgFlash("image chargee (" + w + "x" + h + ", " + Math.round(url.length / 1024) + " Ko)", "ok");
+    } catch (err) {
+      bgFlash(err.message, "err");
+    }
+  });
+
+  $("bgClear").addEventListener("click", () => {
+    cfg.bg.src = ""; cfg.bg.accent = "";
+    $("fBgUrl").value = "";
+    applyBg(); save(); renderFetch();
+    bgFlash("image retiree", "ok");
+  });
+
+  $("fDim").addEventListener("input", e => {
+    cfg.bg.dim = +e.target.value;
+    $("dimVal").textContent = cfg.bg.dim + "%";
+    document.documentElement.style.setProperty("--dim", (cfg.bg.dim / 100).toFixed(2));
+  });
+  $("fDim").addEventListener("change", () => save());
+
+  $("fAuto").addEventListener("change", e => {
+    cfg.bg.auto = e.target.checked;
+    cfg.bg.accent = "";
+    applyBg(true); save(); renderFetch();
+  });
 
   $("apply").addEventListener("click", () => {
     let cats;
     try {
       cats = JSON.parse($("fCats").value);
       if (!Array.isArray(cats)) throw new Error("le JSON doit etre un tableau");
-    } catch (err) {
-      flash("JSON invalide : " + err.message, false);
-      return;
-    }
+    } catch (err) { flash("JSON invalide : " + err.message, false); return; }
     const normalized = normalizeCats(cats);
     if (!normalized.length) { flash("aucune categorie valide dans le JSON", false); return; }
     cfg.name = $("fName").value.trim() || "toi";
     cfg.engine = $("fEngine").value;
     cfg.cats = normalized;
+    if (active >= cfg.cats.length) active = 0;
     save();
     renderAll();
     $("fCats").value = JSON.stringify(cfg.cats, null, 2);
@@ -707,9 +1006,7 @@ button,input,textarea,select{font:inherit;color:inherit}
     const blob = new Blob([JSON.stringify(cfg, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url;
-    a.download = "startpage-config.json";
-    a.click();
+    a.href = url; a.download = "startpage-config.json"; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     flash("startpage-config.json telecharge", true);
   });
@@ -717,38 +1014,39 @@ button,input,textarea,select{font:inherit;color:inherit}
   $("importBtn").addEventListener("click", () => $("importFile").click());
   $("importFile").addEventListener("change", e => {
     const f = e.target.files && e.target.files[0];
+    e.target.value = "";
     if (!f) return;
     const r = new FileReader();
     r.onload = () => {
       try {
         cfg = sanitize(JSON.parse(String(r.result)));
+        active = 0;
         save(); renderAll(); openPanel();
         flash("config importee", true);
-      } catch (err) {
-        flash("fichier illisible : " + err.message, false);
-      }
+      } catch (err) { flash("fichier illisible : " + err.message, false); }
     };
     r.readAsText(f);
-    e.target.value = "";
   });
 
   $("reset").addEventListener("click", () => {
     if (!confirm("Remettre la configuration par defaut ?")) return;
     cfg = clone(DEFAULTS);
+    active = 0;
     save(); renderAll(); openPanel();
     flash("reinitialise", true);
   });
 
   $("close").addEventListener("click", closePanel);
-  $("overlay").addEventListener("mousedown", e => {
-    if (e.target === $("overlay")) closePanel();
-  });
+  $("overlay").addEventListener("mousedown", e => { if (e.target === $("overlay")) closePanel(); });
 
   // ── init ────────────────────────────────────────────────────────────
   function renderAll() {
     applyTheme();
+    buildIndex();
     renderGreeting();
-    renderCats();
+    renderTabs();
+    renderLinks();
+    applyBg();
     renderFetch();
     updateChip();
     tick();
