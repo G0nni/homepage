@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>~/home</title>
 <meta name="color-scheme" content="dark light">
+<!-- redessine par le JS avec l'accent courant ; celui-ci sert de repli -->
+<link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23181825'/%3E%3Cpath d='M18 20L30 32L18 44' fill='none' stroke='%23cba6f7' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M37 45H48' stroke='%23cba6f7' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -591,6 +593,27 @@ button,input,textarea,select{font:inherit;color:inherit}
     const root = document.documentElement;
     if (cfg.bg.src && cfg.bg.auto && cfg.bg.accent) root.style.setProperty("--accent", cfg.bg.accent);
     else root.style.removeProperty("--accent");
+    updateFavicon();
+  }
+
+  // Le prompt de la page, redessine avec les couleurs courantes : l'onglet
+  // suit donc le theme et la couleur extraite de l'image.
+  function updateFavicon() {
+    const cs = getComputedStyle(document.documentElement);
+    const pick = n => {
+      const v = cs.getPropertyValue(n).trim();
+      return /^#([0-9a-f]{3}){1,2}$/i.test(v) ? v : "";
+    };
+    const bg = pick("--mantle") || "#181825";
+    const fg = pick("--accent") || pick("--theme-accent") || "#cba6f7";
+    const svg =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
+      '<rect width="64" height="64" rx="14" fill="' + bg + '"/>' +
+      '<path d="M18 20L30 32L18 44" fill="none" stroke="' + fg +
+        '" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path d="M37 45H48" stroke="' + fg + '" stroke-width="7" stroke-linecap="round"/>' +
+      "</svg>";
+    $("favicon").href = "data:image/svg+xml," + encodeURIComponent(svg);
   }
 
   // ── fond ────────────────────────────────────────────────────────────
