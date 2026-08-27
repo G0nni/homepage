@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>~/home</title>
+<meta name="color-scheme" content="dark light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ── themes ────────────────────────────────────────────────────────── */
+:root{ color-scheme:dark; scrollbar-width:thin; scrollbar-color:var(--line) transparent }
+:root[data-theme="latte"]{ color-scheme:light }
+
+:root,
+:root[data-theme="mocha"]{
+  --base:#1e1e2e; --mantle:#181825; --surface:#313244; --line:#3f4157;
+  --text:#cdd6f4; --subtext:#a6adc8; --muted:#6c7086;
+  --accent:#cba6f7; --accent2:#89b4fa; --green:#a6e3a1; --red:#f38ba8; --yellow:#f9e2af;
+}
+:root[data-theme="latte"]{
+  --base:#eff1f5; --mantle:#e6e9ef; --surface:#dce0e8; --line:#bcc0cc;
+  --text:#4c4f69; --subtext:#5c5f77; --muted:#8c8fa1;
+  --accent:#8839ef; --accent2:#1e66f5; --green:#40a02b; --red:#d20f39; --yellow:#df8e1d;
+}
+:root[data-theme="gruvbox"]{
+  --base:#282828; --mantle:#1d2021; --surface:#3c3836; --line:#504945;
+  --text:#ebdbb2; --subtext:#d5c4a1; --muted:#928374;
+  --accent:#fe8019; --accent2:#83a598; --green:#b8bb26; --red:#fb4934; --yellow:#fabd2f;
+}
+:root[data-theme="nord"]{
+  --base:#2e3440; --mantle:#272c36; --surface:#3b4252; --line:#4c566a;
+  --text:#eceff4; --subtext:#d8dee9; --muted:#7b88a1;
+  --accent:#88c0d0; --accent2:#81a1c1; --green:#a3be8c; --red:#bf616a; --yellow:#ebcb8b;
+}
+:root[data-theme="tokyonight"]{
+  --base:#1a1b26; --mantle:#16161e; --surface:#292e42; --line:#343a55;
+  --text:#c0caf5; --subtext:#a9b1d6; --muted:#565f89;
+  --accent:#bb9af7; --accent2:#7aa2f7; --green:#9ece6a; --red:#f7768e; --yellow:#e0af68;
+}
+:root[data-theme="rosepine"]{
+  --base:#191724; --mantle:#1f1d2e; --surface:#26233a; --line:#312e45;
+  --text:#e0def4; --subtext:#908caa; --muted:#6e6a86;
+  --accent:#c4a7e7; --accent2:#9ccfd8; --green:#31748f; --red:#eb6f92; --yellow:#f6c177;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--base);
+  color:var(--text);
+  font-family:"JetBrains Mono",ui-monospace,"Cascadia Mono","Cascadia Code",Consolas,"SF Mono",Menlo,monospace;
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  display:flex; flex-direction:column;
+  overflow-x:hidden;
+}
+/* halo d'accent, tres leger */
+body::before{
+  content:""; position:fixed; inset:-30%;
+  background:
+    radial-gradient(45% 40% at 22% 18%, color-mix(in srgb,var(--accent) 16%,transparent), transparent 70%),
+    radial-gradient(45% 40% at 78% 82%, color-mix(in srgb,var(--accent2) 14%,transparent), transparent 70%);
+  pointer-events:none; z-index:0;
+  animation:drift 34s ease-in-out infinite alternate;
+}
+@keyframes drift{ to{ transform:translate3d(2.5%,-2%,0) scale(1.08) } }
+
+a{color:inherit;text-decoration:none}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+
+/* ── layout ───────────────────────────────────────────────────────── */
+.wrap{
+  position:relative; z-index:1;
+  flex:1; width:100%; max-width:940px; margin:0 auto;
+  padding:clamp(28px,7vh,72px) 22px 120px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:34px;
+}
+
+/* horloge */
+.clock{text-align:center}
+.greet{color:var(--subtext);font-size:.9rem;letter-spacing:.14em;text-transform:uppercase}
+.greet b{color:var(--accent);font-weight:500}
+.time{
+  font-size:clamp(3.6rem,13vw,7.5rem); font-weight:300; line-height:1;
+  letter-spacing:-.03em; margin:.1em 0 .05em;
+  font-variant-numeric:tabular-nums; display:flex; align-items:baseline; justify-content:center; gap:.02em;
+}
+.time .sep{color:var(--accent);animation:blink 2s steps(1) infinite}
+@keyframes blink{50%{opacity:.25}}
+.time .sec{font-size:.3em;color:var(--muted);margin-left:.35em;align-self:flex-start;padding-top:.55em}
+.date{color:var(--muted);font-size:.85rem;letter-spacing:.05em}
+
+/* recherche */
+.search{width:min(560px,100%);position:relative}
+.search form{
+  display:flex; align-items:center; gap:12px;
+  background:color-mix(in srgb,var(--mantle) 80%,transparent);
+  border:1px solid var(--line); border-radius:12px;
+  padding:0 16px; height:52px;
+  backdrop-filter:blur(14px);
+  transition:border-color .18s, box-shadow .18s;
+}
+.search form:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+.search .prompt{color:var(--accent);font-weight:500;user-select:none}
+.search input{flex:1;background:none;border:0;outline:none;min-width:0}
+.search input::placeholder{color:var(--muted)}
+.chip{
+  font-size:.72rem;padding:3px 9px;border-radius:999px;white-space:nowrap;
+  background:color-mix(in srgb,var(--accent) 18%,transparent);
+  color:var(--accent); border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);
+}
+.chip.engine{background:none;color:var(--muted);border-color:var(--line)}
+
+/* categories */
+.cats{
+  width:100%;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr));
+  gap:12px;
+}
+.cat{
+  background:color-mix(in srgb,var(--mantle) 62%,transparent);
+  border:1px solid var(--line); border-radius:14px;
+  padding:16px 16px 12px;
+  backdrop-filter:blur(14px);
+  transition:border-color .18s;
+}
+.cat:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.cat h2{
+  font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent); margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.cat h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cat ul{list-style:none;display:flex;flex-direction:column;gap:1px}
+.cat li a{
+  display:flex;align-items:center;gap:10px;
+  padding:5px 8px;margin:0 -8px;border-radius:7px;
+  color:var(--subtext); font-size:.88rem;
+  transition:background .14s,color .14s;
+}
+.cat li a:hover,.cat li a.hot{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--text)}
+.cat li a .key{
+  font-size:.68rem;color:var(--muted);
+  border:1px solid var(--line);border-radius:5px;
+  padding:0 5px;min-width:24px;text-align:center;
+  transition:color .14s,border-color .14s;
+}
+.cat li a:hover .key,.cat li a.hot .key{color:var(--accent);border-color:var(--accent)}
+.cat li a .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* fetch (facon neofetch) */
+.fetch{
+  position:fixed;left:26px;bottom:22px;z-index:1;
+  font-size:.74rem;color:var(--muted);line-height:1.65;
+}
+.fetch .who{color:var(--accent);font-weight:500}
+.fetch .who span{color:var(--muted);font-weight:400}
+.fetch .rule{color:var(--line)}
+.fetch dl{display:grid;grid-template-columns:auto auto;gap:0 14px;margin-top:2px}
+.fetch dt{color:var(--accent2)}
+.fetch dd{color:var(--subtext)}
+
+/* barre d'aide */
+.hints{
+  position:fixed;right:26px;bottom:22px;z-index:1;
+  display:flex;align-items:center;gap:14px;
+  font-size:.74rem;color:var(--muted);
+}
+.hints kbd{
+  border:1px solid var(--line);border-radius:5px;padding:1px 6px;
+  color:var(--subtext);font-size:.7rem;
+}
+.buffer{color:var(--accent);letter-spacing:.2em;min-width:2ch}
+
+/* panneau reglages */
+.overlay{
+  position:fixed;inset:0;z-index:10;display:none;
+  background:color-mix(in srgb,var(--base) 72%,transparent);
+  backdrop-filter:blur(6px);
+  padding:24px; overflow-y:auto;
+}
+.overlay.open{display:flex;align-items:flex-start;justify-content:center}
+.panel{
+  width:min(620px,100%); margin:auto;
+  background:var(--mantle); border:1px solid var(--line); border-radius:16px;
+  padding:24px;
+  animation:pop .16s ease-out;
+}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}}
+.panel header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.panel h1{font-size:.95rem;font-weight:500;color:var(--accent);letter-spacing:.08em}
+.panel .x{background:none;border:1px solid var(--line);border-radius:8px;cursor:pointer;color:var(--muted);padding:3px 9px}
+.panel .x:hover{color:var(--red);border-color:var(--red)}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.field input[type=text],.field select,.field textarea{
+  width:100%;background:var(--base);border:1px solid var(--line);border-radius:9px;
+  padding:9px 12px;outline:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field textarea{min-height:210px;resize:vertical;font-size:.8rem;line-height:1.6;white-space:pre;tab-size:2}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.sw{
+  cursor:pointer;border:1px solid var(--line);border-radius:9px;
+  padding:7px 11px;font-size:.78rem;background:none;color:var(--subtext);
+  display:flex;align-items:center;gap:8px;
+}
+.sw:hover{border-color:var(--accent2)}
+.sw[aria-pressed=true]{border-color:var(--accent);color:var(--text)}
+.sw i{width:11px;height:11px;border-radius:50%;display:block}
+.row{display:flex;gap:9px;flex-wrap:wrap}
+.btn{
+  cursor:pointer;background:none;border:1px solid var(--line);border-radius:9px;
+  padding:9px 15px;font-size:.82rem;color:var(--subtext);
+  transition:border-color .15s,color .15s;
+}
+.btn:hover{border-color:var(--accent);color:var(--text)}
+.btn.primary{border-color:var(--accent);color:var(--accent)}
+.btn.danger:hover{border-color:var(--red);color:var(--red)}
+.msg{font-size:.78rem;margin-top:9px;min-height:1.2em}
+.msg.ok{color:var(--green)} .msg.err{color:var(--red)}
+.help{font-size:.74rem;color:var(--muted);margin-top:7px;line-height:1.7}
+.help code{color:var(--accent2)}
+
+@media (max-width:900px){ .fetch{display:none} }
+@media (max-width:560px){
+  .hints{left:0;right:0;justify-content:center}
+  .wrap{padding-top:34px;gap:26px}
+}
+@media (prefers-reduced-motion:reduce){
+  body::before{animation:none} .time .sep{animation:none} .panel{animation:none}
+}
+</style>
+</head>
+<body>
+
+<main class="wrap">
+  <section class="clock">
+    <p class="greet" id="greet"></p>
+    <div class="time">
+      <span id="hh">--</span><span class="sep">:</span><span id="mm">--</span><span class="sec" id="ss">--</span>
+    </div>
+    <p class="date" id="date"></p>
+  </section>
+
+  <section class="search">
+    <form id="searchForm" autocomplete="off">
+      <span class="prompt">&gt;</span>
+      <input id="q" type="text" placeholder="rechercher...  (appuie sur / )" aria-label="Recherche">
+      <span class="chip engine" id="engineChip"></span>
+    </form>
+  </section>
+
+  <section class="cats" id="cats"></section>
+</main>
+
+<aside class="fetch" id="fetch"></aside>
+
+<div class="hints">
+  <span class="buffer" id="buffer"></span>
+  <span><kbd>/</kbd> rechercher</span>
+  <span><kbd>?</kbd> reglages</span>
+  <span><kbd>2 lettres</kbd> ouvrir</span>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="panel" role="dialog" aria-modal="true" aria-label="Reglages">
+    <header>
+      <h1>~/config</h1>
+      <button class="x" id="close" title="Fermer (Esc)">esc</button>
+    </header>
+
+    <div class="field">
+      <label for="fName">Nom</label>
+      <input id="fName" type="text" placeholder="gonni">
+    </div>
+
+    <div class="field">
+      <label>Theme</label>
+      <div class="swatches" id="themes"></div>
+    </div>
+
+    <div class="field">
+      <label for="fEngine">Moteur par defaut</label>
+      <select id="fEngine">
+        <option value="ddg">DuckDuckGo</option>
+        <option value="google">Google</option>
+        <option value="brave">Brave Search</option>
+        <option value="startpage">Startpage</option>
+        <option value="ecosia">Ecosia</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="fCats">Liens (JSON)</label>
+      <textarea id="fCats" spellcheck="false"></textarea>
+      <p class="help">
+        Format : <code>[{ "name":"dev", "links":[{ "name":"GitHub", "url":"...", "key":"gh" }] }]</code><br>
+        <code>key</code> = les 2 lettres a taper pour ouvrir le lien. Laisse vide pour generer automatiquement.
+      </p>
+      <p class="msg" id="msg"></p>
+    </div>
+
+    <div class="row">
+      <button class="btn primary" id="apply">Appliquer</button>
+      <button class="btn" id="export">Exporter</button>
+      <button class="btn" id="importBtn">Importer</button>
+      <button class="btn danger" id="reset">Reinitialiser</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const KEY = "startpage.config.v1";
+
+  const THEMES = [
+    ["mocha",      "catppuccin mocha", "#cba6f7"],
+    ["latte",      "catppuccin latte", "#8839ef"],
+    ["tokyonight", "tokyo night",      "#bb9af7"],
+    ["gruvbox",    "gruvbox",          "#fe8019"],
+    ["nord",       "nord",             "#88c0d0"],
+    ["rosepine",   "rose pine",        "#c4a7e7"],
+  ];
+
+  const ENGINES = {
+    ddg:       ["ddg",       "https://duckduckgo.com/?q="],
+    google:    ["google",    "https://www.google.com/search?q="],
+    brave:     ["brave",     "https://search.brave.com/search?q="],
+    startpage: ["startpage", "https://www.startpage.com/sp/search?q="],
+    ecosia:    ["ecosia",    "https://www.ecosia.org/search?q="],
+  };
+
+  // !bang -> [libelle, url]
+  const BANGS = {
+    g:   ["google",         "https://www.google.com/search?q="],
+    d:   ["ddg",            "https://duckduckgo.com/?q="],
+    y:   ["youtube",        "https://www.youtube.com/results?search_query="],
+    yt:  ["youtube",        "https://www.youtube.com/results?search_query="],
+    gh:  ["github",         "https://github.com/search?q="],
+    n:   ["npm",            "https://www.npmjs.com/search?q="],
+    w:   ["wikipedia",      "https://fr.wikipedia.org/w/index.php?search="],
+    r:   ["reddit",         "https://www.reddit.com/search/?q="],
+    so:  ["stack overflow", "https://stackoverflow.com/search?q="],
+    mdn: ["mdn",            "https://developer.mozilla.org/fr/search?q="],
+    m:   ["maps",           "https://www.google.com/maps/search/"],
+    ai:  ["claude",         "https://claude.ai/new?q="],
+  };
+
+  const DEFAULTS = {
+    name: "gonni",
+    theme: "mocha",
+    engine: "ddg",
+    cats: [
+      { name: "dev", links: [
+        { name: "GitHub",         url: "https://github.com/G0nni",         key: "gh" },
+        { name: "Claude",         url: "https://claude.ai",                key: "cl" },
+        { name: "MDN",            url: "https://developer.mozilla.org/fr/", key: "md" },
+        { name: "Stack Overflow", url: "https://stackoverflow.com",        key: "so" },
+        { name: "Vercel",         url: "https://vercel.com/dashboard",     key: "vc" },
+      ]},
+      { name: "media", links: [
+        { name: "YouTube",     url: "https://www.youtube.com",     key: "yt" },
+        { name: "Crunchyroll", url: "https://www.crunchyroll.com", key: "cr" },
+        { name: "Twitch",      url: "https://www.twitch.tv",       key: "tw" },
+        { name: "Spotify",     url: "https://open.spotify.com",    key: "sp" },
+      ]},
+      { name: "social", links: [
+        { name: "Reddit",     url: "https://www.reddit.com",             key: "rd" },
+        { name: "r/unixporn", url: "https://www.reddit.com/r/unixporn/", key: "up" },
+        { name: "Discord",    url: "https://discord.com/app",            key: "ds" },
+        { name: "Gmail",      url: "https://mail.google.com",            key: "ml" },
+      ]},
+      { name: "veille", links: [
+        { name: "Hacker News", url: "https://news.ycombinator.com", key: "hn" },
+        { name: "Lobsters",    url: "https://lobste.rs",            key: "lo" },
+        { name: "Le Monde",    url: "https://www.lemonde.fr",       key: "lm" },
+      ]},
+    ],
+  };
+
+  // ── etat ────────────────────────────────────────────────────────────
+  const clone = o => JSON.parse(JSON.stringify(o));
+  let cfg = load();
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return clone(DEFAULTS);
+      return sanitize(JSON.parse(raw));
+    } catch { return clone(DEFAULTS); }
+  }
+
+  function sanitize(o) {
+    const base = clone(DEFAULTS);
+    if (!o || typeof o !== "object") return base;
+    if (typeof o.name === "string") base.name = o.name;
+    if (THEMES.some(t => t[0] === o.theme)) base.theme = o.theme;
+    if (ENGINES[o.engine]) base.engine = o.engine;
+    if (Array.isArray(o.cats)) base.cats = normalizeCats(o.cats);
+    return base;
+  }
+
+  function normalizeCats(cats) {
+    const taken = new Set();
+    return cats
+      .filter(c => c && typeof c.name === "string" && Array.isArray(c.links))
+      .map(c => ({
+        name: c.name,
+        links: c.links
+          .filter(l => l && typeof l.name === "string" && typeof l.url === "string" && l.url.trim())
+          .map(l => {
+            let key = (typeof l.key === "string" ? l.key : "").toLowerCase().replace(/[^a-z]/g, "").slice(0, 2);
+            if (key.length < 2 || taken.has(key)) key = autoKey(l.name, taken);
+            taken.add(key);
+            return { name: l.name, url: l.url.trim(), key };
+          }),
+      }));
+  }
+
+  // derive 2 lettres libres a partir du nom du lien
+  function autoKey(name, taken) {
+    const s = name.toLowerCase().replace(/[^a-z]/g, "") || "xx";
+    const tries = [];
+    for (let i = 0; i < s.length; i++)
+      for (let j = i + 1; j < s.length; j++) tries.push(s[i] + s[j]);
+    const alpha = "abcdefghijklmnopqrstuvwxyz";
+    for (const a of alpha) for (const b of alpha) tries.push(a + b);
+    return tries.find(k => !taken.has(k)) || "zz";
+  }
+
+  function save() {
+    cfg.cats = normalizeCats(cfg.cats);
+    try { localStorage.setItem(KEY, JSON.stringify(cfg)); } catch {}
+  }
+
+  // ── rendu ───────────────────────────────────────────────────────────
+  const $ = id => document.getElementById(id);
+
+  function applyTheme() {
+    document.documentElement.dataset.theme = cfg.theme;
+  }
+
+  function renderGreeting() {
+    const h = new Date().getHours();
+    const g = h < 5 ? "bonne nuit" : h < 12 ? "bonjour" : h < 18 ? "bon apres-midi" : "bonsoir";
+    const el = $("greet");
+    el.textContent = g + ", ";
+    const b = document.createElement("b");
+    b.textContent = cfg.name;
+    el.appendChild(b);
+  }
+
+  function renderCats() {
+    const box = $("cats");
+    box.textContent = "";
+    for (const cat of cfg.cats) {
+      const sec = document.createElement("div");
+      sec.className = "cat";
+      const h = document.createElement("h2");
+      h.textContent = cat.name;
+      sec.appendChild(h);
+      const ul = document.createElement("ul");
+      for (const l of cat.links) {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = l.url;
+        a.dataset.key = l.key;
+        a.rel = "noreferrer";
+        const k = document.createElement("span");
+        k.className = "key"; k.textContent = l.key;
+        const n = document.createElement("span");
+        n.className = "name"; n.textContent = l.name;
+        a.append(k, n);
+        li.appendChild(a);
+        ul.appendChild(li);
+      }
+      sec.appendChild(ul);
+      box.appendChild(sec);
+    }
+  }
+
+  // ── horloge ─────────────────────────────────────────────────────────
+  const started = Date.now();
+  const pad = n => String(n).padStart(2, "0");
+
+  function tick() {
+    const d = new Date();
+    $("hh").textContent = pad(d.getHours());
+    $("mm").textContent = pad(d.getMinutes());
+    $("ss").textContent = pad(d.getSeconds());
+    $("date").textContent = d.toLocaleDateString("fr-FR",
+      { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    const up = Math.floor((Date.now() - started) / 1000);
+    const el = $("uptime");
+    if (el) el.textContent = pad(Math.floor(up / 3600)) + ":" + pad(Math.floor(up / 60) % 60) + ":" + pad(up % 60);
+  }
+
+  // ── fetch (facon neofetch) ──────────────────────────────────────────
+  function detectBrowser() {
+    const ua = navigator.userAgent;
+    let m;
+    if ((m = /Firefox\/(\d+)/.exec(ua)))            return "firefox " + m[1];
+    if ((m = /Edg\/(\d+)/.exec(ua)))                return "edge " + m[1];
+    if ((m = /OPR\/(\d+)/.exec(ua)))                return "opera " + m[1];
+    if ((m = /Chrome\/(\d+)/.exec(ua)))             return "chrome " + m[1];
+    if ((m = /Version\/(\d+).*Safari/.exec(ua)))    return "safari " + m[1];
+    return "navigateur";
+  }
+
+  function detectOS() {
+    const p = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "";
+    const ua = navigator.userAgent;
+    if (/Win/i.test(p) || /Windows/i.test(ua)) return "Windows";
+    if (/iPhone|iPad/i.test(ua)) return "iOS";
+    if (/Android/i.test(ua)) return "Android";
+    if (/Mac/i.test(p)) return "macOS";
+    if (/Linux/i.test(p)) return "Linux";
+    return p || "inconnu";
+  }
+
+  function renderFetch() {
+    const rows = [
+      ["os",      detectOS()],
+      ["browser", detectBrowser()],
+      ["shell",   "startpage.html"],
+      ["res",     screen.width + "x" + screen.height],
+      ["theme",   cfg.theme],
+      ["links",   String(cfg.cats.reduce((n, c) => n + c.links.length, 0))],
+      ["uptime",  "00:00:00"],
+    ];
+    const host = location.hostname || "local";
+    const el = $("fetch");
+    el.textContent = "";
+
+    const who = document.createElement("div");
+    who.className = "who";
+    who.textContent = cfg.name;
+    const at = document.createElement("span");
+    at.textContent = "@" + host;
+    who.appendChild(at);
+
+    const rule = document.createElement("div");
+    rule.className = "rule";
+    rule.textContent = "─".repeat(Math.max(12, cfg.name.length + host.length + 1));
+
+    const dl = document.createElement("dl");
+    for (const [k, v] of rows) {
+      const dt = document.createElement("dt"); dt.textContent = k;
+      const dd = document.createElement("dd"); dd.textContent = v;
+      if (k === "uptime") dd.id = "uptime";
+      dl.append(dt, dd);
+    }
+    el.append(who, rule, dl);
+  }
+
+  // ── recherche + bangs ───────────────────────────────────────────────
+  function parseQuery(raw) {
+    const s = raw.trim();
+    const bang = /^!([a-z]+)\s*([\s\S]*)$/i.exec(s);
+    if (bang) {
+      const b = BANGS[bang[1].toLowerCase()];
+      if (b) return { url: b[1] + encodeURIComponent(bang[2]), label: b[0] };
+    }
+    // une URL ou un domaine tape directement -> on y va
+    if (/^https?:\/\//i.test(s)) return { url: s, label: "url" };
+    if (!/\s/.test(s) && /^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(s))
+      return { url: "https://" + s, label: "url" };
+
+    const [label, base] = ENGINES[cfg.engine] || ENGINES.ddg;
+    return { url: base + encodeURIComponent(s), label };
+  }
+
+  function updateChip() {
+    const v = $("q").value;
+    const chip = $("engineChip");
+    const def = ENGINES[cfg.engine][0];
+    if (!v.trim()) {
+      chip.className = "chip engine";
+      chip.textContent = def;
+      return;
+    }
+    const r = parseQuery(v);
+    chip.className = r.label === def ? "chip engine" : "chip";
+    chip.textContent = r.label;
+  }
+
+  $("searchForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const v = $("q").value.trim();
+    if (!v) return;
+    location.href = parseQuery(v).url;
+  });
+  $("q").addEventListener("input", updateChip);
+
+  // ── raccourcis clavier ──────────────────────────────────────────────
+  let buf = "", bufTimer = null;
+
+  function setBuf(s) {
+    buf = s;
+    $("buffer").textContent = s;
+    document.querySelectorAll(".cat a.hot").forEach(a => a.classList.remove("hot"));
+    if (s) {
+      document.querySelectorAll(".cat a").forEach(a => {
+        if (a.dataset.key.startsWith(s)) a.classList.add("hot");
+      });
+    }
+    clearTimeout(bufTimer);
+    if (s) bufTimer = setTimeout(() => setBuf(""), 1200);
+  }
+
+  document.addEventListener("keydown", e => {
+    const t = e.target;
+    const typing = t instanceof HTMLElement &&
+      (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable);
+
+    if (e.key === "Escape") {
+      if ($("overlay").classList.contains("open")) closePanel();
+      else if (typing) t.blur();
+      setBuf("");
+      return;
+    }
+    if (typing || e.ctrlKey || e.altKey || e.metaKey) return;
+
+    if (e.key === "/") { e.preventDefault(); $("q").focus(); return; }
+    if (e.key === "?") { e.preventDefault(); openPanel(); return; }
+
+    if (/^[a-zA-Z]$/.test(e.key)) {
+      const c = e.key.toLowerCase();
+      const links = [...document.querySelectorAll(".cat a")];
+      const next = (buf + c).slice(-2);
+      const hit = links.find(a => a.dataset.key === next);
+      if (hit) { setBuf(""); location.href = hit.href; return; }
+      // on ne garde le tampon que si une cible commence par cette lettre
+      setBuf(links.some(a => a.dataset.key.startsWith(c)) ? c : "");
+    }
+  });
+
+  // ── panneau reglages ────────────────────────────────────────────────
+  function openPanel() {
+    $("fName").value = cfg.name;
+    $("fEngine").value = cfg.engine;
+    $("fCats").value = JSON.stringify(cfg.cats, null, 2);
+    renderThemeButtons();
+    $("msg").textContent = "";
+    $("overlay").classList.add("open");
+    $("fName").focus();
+  }
+  function closePanel() { $("overlay").classList.remove("open"); }
+
+  function renderThemeButtons() {
+    const box = $("themes");
+    box.textContent = "";
+    for (const [id, label, color] of THEMES) {
+      const b = document.createElement("button");
+      b.className = "sw";
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(cfg.theme === id));
+      const dot = document.createElement("i");
+      dot.style.background = color;
+      const span = document.createElement("span");
+      span.textContent = label;
+      b.append(dot, span);
+      b.addEventListener("click", () => {
+        cfg.theme = id;
+        applyTheme(); save(); renderThemeButtons(); renderFetch(); tick();
+      });
+      box.appendChild(b);
+    }
+  }
+
+  function flash(text, ok) {
+    const m = $("msg");
+    m.textContent = text;
+    m.className = "msg " + (ok ? "ok" : "err");
+  }
+
+  $("apply").addEventListener("click", () => {
+    let cats;
+    try {
+      cats = JSON.parse($("fCats").value);
+      if (!Array.isArray(cats)) throw new Error("le JSON doit etre un tableau");
+    } catch (err) {
+      flash("JSON invalide : " + err.message, false);
+      return;
+    }
+    const normalized = normalizeCats(cats);
+    if (!normalized.length) { flash("aucune categorie valide dans le JSON", false); return; }
+    cfg.name = $("fName").value.trim() || "toi";
+    cfg.engine = $("fEngine").value;
+    cfg.cats = normalized;
+    save();
+    renderAll();
+    $("fCats").value = JSON.stringify(cfg.cats, null, 2);
+    flash("enregistre", true);
+  });
+
+  $("export").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(cfg, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "startpage-config.json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    flash("startpage-config.json telecharge", true);
+  });
+
+  $("importBtn").addEventListener("click", () => $("importFile").click());
+  $("importFile").addEventListener("change", e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        cfg = sanitize(JSON.parse(String(r.result)));
+        save(); renderAll(); openPanel();
+        flash("config importee", true);
+      } catch (err) {
+        flash("fichier illisible : " + err.message, false);
+      }
+    };
+    r.readAsText(f);
+    e.target.value = "";
+  });
+
+  $("reset").addEventListener("click", () => {
+    if (!confirm("Remettre la configuration par defaut ?")) return;
+    cfg = clone(DEFAULTS);
+    save(); renderAll(); openPanel();
+    flash("reinitialise", true);
+  });
+
+  $("close").addEventListener("click", closePanel);
+  $("overlay").addEventListener("mousedown", e => {
+    if (e.target === $("overlay")) closePanel();
+  });
+
+  // ── init ────────────────────────────────────────────────────────────
+  function renderAll() {
+    applyTheme();
+    renderGreeting();
+    renderCats();
+    renderFetch();
+    updateChip();
+    tick();
+  }
+
+  renderAll();
+  setInterval(tick, 1000);
+  setInterval(renderGreeting, 60000);
+})();
+</script>
+</body>
+</html>
