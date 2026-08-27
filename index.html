@@ -78,7 +78,7 @@ button,input,textarea,select{font:inherit;color:inherit}
 /* ── layout ───────────────────────────────────────────────────────── */
 .wrap{
   position:relative; z-index:1;
-  flex:1; width:100%; max-width:620px; margin:0 auto;
+  flex:1; width:100%; max-width:940px; margin:0 auto;
   padding:clamp(28px,7vh,72px) 22px 90px;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:30px;
 }
@@ -97,7 +97,7 @@ button,input,textarea,select{font:inherit;color:inherit}
 .date{color:var(--muted);font-size:.85rem;letter-spacing:.05em}
 
 /* ── barre + resultats ────────────────────────────────────────────── */
-.omni{width:100%;display:flex;flex-direction:column;gap:8px}
+.omni{width:min(560px,100%);display:flex;flex-direction:column;gap:8px}
 .omni form{
   display:flex; align-items:center; gap:12px;
   background:color-mix(in srgb,var(--mantle) 78%,transparent);
@@ -144,6 +144,42 @@ button,input,textarea,select{font:inherit;color:inherit}
 .res.web .key{border-style:dashed}
 .res.web .name{color:var(--muted)}
 .res.web b{color:var(--text);font-weight:400}
+
+/* ── cartes (etat de repos) ───────────────────────────────────────── */
+.cats{
+  width:100%;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr)); gap:12px;
+}
+.cats[hidden]{display:none}
+.cat{
+  background:color-mix(in srgb,var(--mantle) 62%,transparent);
+  border:1px solid var(--line); border-radius:14px;
+  padding:16px 16px 12px; backdrop-filter:blur(14px);
+  transition:border-color .18s;
+}
+.cat:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.cat h2{
+  font-size:.72rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent); margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.cat h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.cat ul{list-style:none;display:flex;flex-direction:column;gap:1px}
+.cat li a{
+  display:flex;align-items:center;gap:10px;
+  padding:5px 8px;margin:0 -8px;border-radius:7px;
+  color:var(--subtext);font-size:.88rem;
+  transition:background .14s,color .14s;
+}
+.cat li a:hover,.cat li a.hot{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--text)}
+.cat li a .key{
+  font-size:.68rem;color:var(--muted);
+  border:1px solid var(--line);border-radius:5px;
+  padding:0 5px;min-width:24px;text-align:center;flex:none;
+  transition:color .14s,border-color .14s;
+}
+.cat li a:hover .key,.cat li a.hot .key{color:var(--accent);border-color:var(--accent)}
+.cat li a .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ── fetch ────────────────────────────────────────────────────────── */
 .fetch{position:absolute;left:26px;bottom:22px;z-index:1;font-size:.74rem;color:var(--muted);line-height:1.65}
@@ -239,6 +275,8 @@ button,input,textarea,select{font:inherit;color:inherit}
     </form>
     <div class="results" id="results" role="listbox" aria-label="Resultats"></div>
   </section>
+
+  <section class="cats" id="cats"></section>
 </main>
 
 <aside class="fetch" id="fetch"></aside>
@@ -385,18 +423,18 @@ button,input,textarea,select{font:inherit;color:inherit}
     cats: [
       { name: "perso", links: [
         { name: "GitHub",          url: "https://github.com/G0nni",     key: "gh", pin: true },
-        { name: "Portfolio",       url: "https://nicolas-cros.fr",      key: "pf" },
-        { name: "Blog",            url: "https://anindividual.me",      key: "bl" },
-        { name: "Soso Dedeck",     url: "https://soso-dedeck.fr",       key: "sd" },
-        { name: "ArtistDiscovery", url: "https://artist-discovery.com", key: "ad" },
+        { name: "Portfolio",       url: "https://nicolas-cros.fr",      key: "pf", pin: true },
+        { name: "Blog",            url: "https://anindividual.me",      key: "bl", pin: true },
+        { name: "Soso Dedeck",     url: "https://soso-dedeck.fr",       key: "sd", pin: true },
+        { name: "ArtistDiscovery", url: "https://artist-discovery.com", key: "ad", pin: true },
       ]},
       { name: "dev", links: [
         { name: "Claude",   url: "https://claude.ai",                 key: "cl", pin: true },
-        { name: "ChatGPT",  url: "https://chatgpt.com",               key: "cg" },
+        { name: "ChatGPT",  url: "https://chatgpt.com",               key: "cg", pin: true },
         { name: "v0",       url: "https://v0.dev",                    key: "vd" },
-        { name: "Next.js",  url: "https://nextjs.org/docs",           key: "nx" },
+        { name: "Next.js",  url: "https://nextjs.org/docs",           key: "nx", pin: true },
         { name: "Tailwind", url: "https://tailwindcss.com/docs",      key: "tl" },
-        { name: "MDN",      url: "https://developer.mozilla.org/fr/", key: "md" },
+        { name: "MDN",      url: "https://developer.mozilla.org/fr/", key: "md", pin: true },
       ]},
       { name: "outils", links: [
         { name: "Excalidraw", url: "https://excalidraw.com",            key: "ex" },
@@ -408,14 +446,14 @@ button,input,textarea,select{font:inherit;color:inherit}
       { name: "media", links: [
         { name: "Stremio",       url: "https://web.stremio.com",   key: "st", pin: true },
         { name: "YouTube",       url: "https://www.youtube.com",   key: "yt", pin: true },
-        { name: "YouTube Music", url: "https://music.youtube.com", key: "ym" },
+        { name: "YouTube Music", url: "https://music.youtube.com", key: "ym", pin: true },
         { name: "Twitch",        url: "https://www.twitch.tv",     key: "tw", pin: true },
       ]},
       { name: "veille", links: [
         { name: "Hacker News",        url: "https://news.ycombinator.com",    key: "hn", pin: true },
-        { name: "Lobsters",           url: "https://lobste.rs",               key: "lo" },
-        { name: "Journal du Hacker",  url: "https://www.journalduhacker.net", key: "jh" },
-        { name: "LinuxFr",            url: "https://linuxfr.org",             key: "lf" },
+        { name: "Lobsters",           url: "https://lobste.rs",               key: "lo", pin: true },
+        { name: "Journal du Hacker",  url: "https://www.journalduhacker.net", key: "jh", pin: true },
+        { name: "LinuxFr",            url: "https://linuxfr.org",             key: "lf", pin: true },
         { name: "This Week in React", url: "https://thisweekinreact.com",     key: "wr" },
       ]},
       { name: "inspi", links: [
@@ -672,18 +710,51 @@ button,input,textarea,select{font:inherit;color:inherit}
     el.appendChild(b);
   }
 
+  // Au repos ce sont les cartes qui s'affichent ; la liste de resultats ne
+  // remplace la grille que pendant la frappe.
+  function renderCats() {
+    const box = $("cats");
+    box.textContent = "";
+    const anyPin = index.some(l => l.pin);
+    for (const c of cfg.cats) {
+      const links = anyPin ? c.links.filter(l => l.pin) : c.links;
+      if (!links.length) continue;
+      const sec = document.createElement("section");
+      sec.className = "cat";
+      const h = document.createElement("h2");
+      h.textContent = c.name;
+      const ul = document.createElement("ul");
+      for (const l of links) {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = l.url; a.dataset.key = l.key; a.rel = "noreferrer";
+        const k = document.createElement("span");
+        k.className = "key"; k.textContent = l.key;
+        const n = document.createElement("span");
+        n.className = "name"; n.textContent = l.name;
+        a.append(k, n);
+        li.appendChild(a);
+        ul.appendChild(li);
+      }
+      sec.append(h, ul);
+      box.appendChild(sec);
+    }
+  }
+
   function renderResults() {
     const raw = $("q").value;
     const q = raw.trim();
     const box = $("results");
     box.textContent = "";
+    $("cats").hidden = !!q;
+
+    if (!q) { items = []; sel = -1; return; }
 
     items = isDirect(raw) ? [] : filterLinks(raw).map(l => ({ type: "link", l }));
-    if (q) items.push({ type: "web", q });
+    items.push({ type: "web", q });
 
     if (sel >= items.length) sel = items.length - 1;
-    if (!q && items.length) sel = -1;
-    if (q && sel < 0) sel = 0;
+    if (sel < 0) sel = 0;
 
     items.forEach((it, i) => {
       const row = document.createElement("div");
@@ -835,6 +906,10 @@ button,input,textarea,select{font:inherit;color:inherit}
   function setBuf(s) {
     buf = s;
     $("buffer").textContent = s;
+    document.querySelectorAll(".cat a.hot").forEach(a => a.classList.remove("hot"));
+    if (s) document.querySelectorAll(".cat a").forEach(a => {
+      if (a.dataset.key.startsWith(s)) a.classList.add("hot");
+    });
     clearTimeout(bufTimer);
     if (s) bufTimer = setTimeout(() => setBuf(""), 1200);
   }
@@ -1014,6 +1089,7 @@ button,input,textarea,select{font:inherit;color:inherit}
     applyBg();
     renderFetch();
     updateChip();
+    renderCats();
     renderResults();
     tick();
   }
